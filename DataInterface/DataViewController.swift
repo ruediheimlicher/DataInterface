@@ -99,9 +99,114 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    var swiftArray = [[String:AnyObject]]()
 
+   @IBOutlet weak var save_SD_check: NSButton!
+   @IBOutlet weak var Start_Messung: NSButton!
    
+   @IBOutlet weak var manufactorer: NSTextField!
+   @IBOutlet weak var Counter: NSTextField!
+   
+   @IBOutlet weak var Start: NSButton!
+   
+   @IBOutlet weak var inputDataFeldFeld: NSTextField!
+   
+   @IBOutlet weak var USB_OK: NSTextField!
+   
+   @IBOutlet weak var start_read_USB_Knopf: NSButton!
+   @IBOutlet weak var stop_read_USB_Knopf: NSButton!
+   @IBOutlet weak var cont_read_check: NSButton!
+   
+   @IBOutlet weak var start_write_USB_Knopf: NSButton!
+   @IBOutlet weak var stop_write_USB_Knopf: NSButton!
+   @IBOutlet weak var cont_write_check: NSButton!
+   
+   
+   @IBOutlet weak var codeFeld: NSTextField!
+   
+   @IBOutlet weak var data0: NSTextField!
+   
+   @IBOutlet weak var data1: NSTextField!
+   
+   @IBOutlet  var inputDataFeld: NSTextView!
+   
+   @IBOutlet weak var write_sd_startblock: NSTextField!
+   @IBOutlet weak var write_sd_anzahl: NSTextField!
+   @IBOutlet weak var read_sd_startblock: NSTextField!
+   @IBOutlet weak var read_sd_anzahl: NSTextField!
+   
+   @IBOutlet  var downloadDataFeld: NSTextView!
+   
+   
+   @IBOutlet weak var data2: NSTextField!
+   @IBOutlet weak var data3: NSTextField!
+   
+   
+   @IBOutlet weak var H_Feld: NSTextField!
+   
+   @IBOutlet weak var L_Feld: NSTextField!
+   
+   @IBOutlet weak var spannungsanzeige: NSSlider!
+   @IBOutlet weak var extspannungFeld: NSTextField!
+   
+   @IBOutlet weak var spL: NSTextField!
+   @IBOutlet weak var spH: NSTextField!
+   
+   @IBOutlet weak var extstrom: NSTextField!
+   @IBOutlet weak var Teensy_Status: NSButton!
+   
+   
+   @IBOutlet weak var extspannungStepper: NSStepper!
+   
+   
+   // Datum
+   @IBOutlet weak var sec_Feld: NSTextField!
+   @IBOutlet weak var min_Feld: NSTextField!
+   @IBOutlet weak var std_Feld: NSTextField!
+   @IBOutlet weak var wt_Feld: NSTextField!
+   @IBOutlet weak var mon_Feld: NSTextField!
+   @IBOutlet weak var jahr_Feld: NSTextField!
+   @IBOutlet weak var datum_Feld: NSTextField!
+   @IBOutlet weak var zeit_Feld: NSTextField!
+   @IBOutlet weak var tagsec_Feld: NSTextField!
+   @IBOutlet weak var tagmin_Feld: NSTextField!
+   
+   
+   @IBOutlet weak var DSLO_Feld: NSTextField!
+   @IBOutlet weak var DSHI_Feld: NSTextField!
+   @IBOutlet weak var DSTempFeld: NSTextField!
+   
+   // ADC
+   @IBOutlet weak var ADCLO_Feld: NSTextField!
+   @IBOutlet weak var ADCHI_Feld: NSTextField!
+   @IBOutlet weak var ADCFeld: NSTextField!
+   
+   @IBOutlet weak var ServoASlider: NSSlider!
+   
+   // Logging
+   @IBOutlet weak var Start_Logger: NSButton!
+   @IBOutlet weak var Stop_Logger: NSButton!
+   
+   
+   // Einstellungen
+   @IBOutlet weak var IntervallPop: NSComboBox!
+   @IBOutlet weak  var TaskListe: NSTableView!
+   @IBOutlet weak var Set_Settings: NSButton!
+   
+   // USB-code
+   @IBOutlet weak var bit0_check: NSButton!
+   @IBOutlet weak var bit1_check: NSButton!
+   @IBOutlet weak var bit2_check: NSButton!
+   @IBOutlet weak var bit3_check: NSButton!
+   @IBOutlet weak var bit4_check: NSButton!
+   @IBOutlet weak var bit5_check: NSButton!
+   @IBOutlet weak var bit6_check: NSButton!
+   @IBOutlet weak var bit7_check: NSButton!
+   
+   // mmc
+   @IBOutlet weak var mmcLOFeld: NSTextField!
+   @IBOutlet weak var mmcHIFeld: NSTextField!
+   @IBOutlet weak var mmcDataFeld: NSTextField!
 
-   @IBOutlet weak var inputDataFeld: NSTextView!
+
 
    
    @IBAction func SaveResBut(sender: AnyObject)
