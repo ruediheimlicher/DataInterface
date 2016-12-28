@@ -99,6 +99,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    var swiftArray = [[String:AnyObject]]()
    
+   var teensy = usb_teensy()
+
+   
    
    // Diagramm
    @IBOutlet  var datagraph: DataPlot!
@@ -212,8 +215,341 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet weak var mmcLOFeld: NSTextField!
    @IBOutlet weak var mmcHIFeld: NSTextField!
    @IBOutlet weak var mmcDataFeld: NSTextField!
+   
+   
+   open func writeData(name:String, data:String)
+   {
+      /*
+       // http://www.techotopia.com/index.php/Working_with_Directories_in_Swift_on_iOS_8
+       do {
+       let filelist = try filemgr.contentsOfDirectory(atPath: "/")
+       
+       for filename in filelist {
+       print(filename)
+       }
+       } catch let error {
+       print("Error: \(error.localizedDescription)")
+       }
+       */
+      //print ("\nwriteData data: \(data)")
+      
+      //http://stackoverflow.com/questions/24097826/read-and-write-data-from-text-file
+      // http://www.techotopia.com/index.php/Working_with_Directories_in_Swift_on_iOS_8
+      
+      do
+      {
+         let documentDirectoryURL = try FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+         var datapfad = documentDirectoryURL.appendingPathComponent("LoggerdataDir")
+         
+         do
+         {
+            try FileManager.default.createDirectory(atPath: datapfad.path, withIntermediateDirectories: true, attributes: nil)
+         }
+         catch let error as NSError
+         {
+            print(error.localizedDescription);
+         }
+         
+         
+         print ("datapfad: \(datapfad)")
+         
+         datapfad = datapfad.appendingPathComponent(name)
+         
+         //writing
+         do
+         {
+            try data.write(to: datapfad, atomically: false, encoding: String.Encoding.utf8)
+         }
+         catch let error as NSError
+         {
+            print(error.localizedDescription);
+         }
+      }
+      catch
+      {
+         print("catch write")
+      }
+      
+      return
+      
+      
+      
+      if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+      {
+         
+         let path = dir.appendingPathComponent(data)
+         
+         //writing
+         do
+         {
+            try data.write(to: path, atomically: false, encoding: String.Encoding.utf8)
+         }
+         catch {/* error handling here */}
+         
+         //reading
+         do {
+            let text2 = try String(contentsOf: path, encoding: String.Encoding.utf8)
+            print("text2: \(text2)")
+            inputDataFeld.string = text2
+         }
+         catch {/* error handling here */}
+         
+      }
+   } // writeData
+   
+   
+   
+   
+   func tagsekunde()-> Int
+   {
+      let date = Date()
+      let calendar = Calendar.current
+      let formatter = DateFormatter()
+      formatter.locale = Locale(identifier: "gsw-CH")
+      
+      let stunde = calendar.component(.hour, from: date)
+      let minute = calendar.component(.minute, from: date)
+      let sekunde = calendar.component(.second, from: date)
+      return 3600 * stunde + 60 * minute + sekunde
+   }
+   
+   func datumstring()->String
+   {
+      let date = Date()
+      let calendar = Calendar.current
+      let jahr = calendar.component(.year, from: date)
+      let tagdesmonats = calendar.component(.day, from: date)
+      let monatdesjahres = calendar.component(.month, from: date)
+      let formatter = DateFormatter()
+      formatter.locale = Locale(identifier: "gsw-CH")
+      
+      formatter.dateFormat = "dd.MM.yyyy"
+      let datumString = formatter.string(from: date)
+      print("datumString: \(datumString)*")
+      return datumString
+   }
+   
+   func zeitstring()->String
+   {
+      let date = Date()
+      let calendar = Calendar.current
+      let formatter = DateFormatter()
+      formatter.locale = Locale(identifier: "gsw-CH")
+      
+      let stunde = calendar.component(.hour, from: date)
+      let minute = calendar.component(.minute, from: date)
+      let sekunde = calendar.component(.second, from: date)
+      formatter.dateFormat = "hh:mm:ss"
+      let zeitString = formatter.string(from: date)
+      return zeitString
+   }
+   
+   func datumprefix()->String
+   {
+      let date = Date()
+      let calendar = Calendar.current
+      let formatter = DateFormatter()
+      formatter.locale = Locale(identifier: "gsw-CH")
+      
+      let jahr = calendar.component(.year, from: date)
+      let tagdesmonats = calendar.component(.day, from: date)
+      let monatdesjahres = calendar.component(.month, from: date)
+      let stunde = calendar.component(.hour, from: date)
+      let minute = calendar.component(.minute, from: date)
+      
+      
+      
+      formatter.dateFormat = "yyMMdd_HHmm"
+      let prefixString = formatter.string(from: date)
+      return prefixString
+   }
+   
+   func MessungDataString(data:[[Float]])-> String
+   {
+      var datastring:String = ""
+      var datastringarray:[String] = []
+      print("setMessungData: \(data)")
+      for index in 0..<data.count
+      {
+         let tempzeilenarray:[Float] = data[index]
+         if (tempzeilenarray.count > 0)
+         {
+            
+            let tempzeilenstring = tempzeilenarray.map{String($0)}.joined(separator: "\t")
+            datastringarray.append(tempzeilenstring)
+            datastring = datastring +  "\n" + tempzeilenstring
+         }
+      }
+      let prefix = datumprefix()
+      let dataname = prefix + "_messungdump.txt"
+      
+      //      writeData(name: dataname,data:datastring)
+      
+      
+      return datastring
+   }
+   
 
 
+
+  //MARK: - Konfig Messung
+   @IBAction func reportSetSettings(_ sender: NSButton)
+   {
+      print("reportSetSettings")
+      print("\(swiftArray)")
+      teensy.write_byteArray[0] = UInt8(LOGGER_SETTING)
+      //Task lesen
+      
+      let save_SD = save_SD_check?.state
+      var loggersettings:UInt8 = 0
+      if ((save_SD == 1)) // Daten auf SD sichern
+      {
+         loggersettings = loggersettings | 0x01 // Bit 0
+         
+      }
+      
+      teensy.write_byteArray[SAVE_SD_BYTE] = loggersettings
+      //Intervall lesen
+      let selectedItem = IntervallPop.indexOfSelectedItem
+      let intervallwert = IntervallPop .intValue
+      // Taktintervall in array einsetzen
+      teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(intervallwert & 0x00FF)
+      teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((intervallwert & 0xFF00)>>8)
+      //    print("reportTaskIntervall teensy.write_byteArray[TAKT_LO_BYTE]: \(teensy.write_byteArray[TAKT_LO_BYTE])")
+      // Abschnitt auf SD
+      teensy.write_byteArray[ABSCHNITT_BYTE] = 0
+      
+      
+      //Angabe zum  Startblock lesen. default ist 0
+      let startblock = write_sd_startblock.integerValue
+      teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
+      teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+      
+      
+      let senderfolg = teensy.start_write_USB()
+      if (senderfolg > 0)
+      {
+         NSSound(named: "Glass")?.play()
+      }
+      
+      
+   }
+
+   @IBAction func reportTaskIntervall(_ sender: NSComboBox)
+   {
+      print("reportTaskIntervall index: \(sender.indexOfSelectedItem)")
+      if (sender.indexOfSelectedItem >= 0)
+      {
+         let wahl = sender.objectValueOfSelectedItem! as! String
+         let index = sender.indexOfSelectedItem
+         // print("reportTaskIntervall wahl: \(wahl) index: \(index)")
+         // http://stackoverflow.com/questions/24115141/swift-converting-string-to-int
+         let integerwahl:UInt16? = UInt16(wahl)
+         print("reportTaskIntervall integerwahl: \(integerwahl!)")
+         
+         if let integerwahl = UInt16(wahl)
+         {
+            print("By optional binding :", integerwahl) // 20
+         }
+         
+         //et num:Int? = Int(firstTextField.text!);
+         // Taktintervall in array einsetzen
+         teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(integerwahl! & 0x00FF)
+         teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((integerwahl! & 0xFF00)>>8)
+         //    print("reportTaskIntervall teensy.write_byteArray[TAKT_LO_BYTE]: \(teensy.write_byteArray[TAKT_LO_BYTE])")
+      }
+   }
+   
+   @IBAction func reportTaskListe(_ sender: NSTableView)
+   {
+      //print("reportTaskListe index: \(sender.selectedColumn)")
+      
+   }
+   
+   @IBAction func reportTaskCheck(_ sender: NSButton)
+   {
+      //print("reportTaskCheck state: \(sender.state)")
+      //let zeile = TaskListe.selectedRow
+      //var zelle = swiftArray[TaskListe.selectedRow] //as! [String:AnyObject]
+      
+      // let check = zelle["task"] as! Int
+      // if (check == 0)
+      
+      if (swiftArray[TaskListe.selectedRow]["task"] as! Int == 1)
+      {
+         swiftArray[TaskListe.selectedRow]["task"] = 0  as AnyObject?
+      }
+      else
+      {
+         //zelle["task"] = 0 as AnyObject?
+         swiftArray[TaskListe.selectedRow]["task"] = 1  as AnyObject?
+      }
+   }
+
+   @IBAction func report_start_messung(_ sender: NSButton)
+   {
+      print("start_messung sender: \(sender.state)") // gibt neuen State an
+      if (sender.state == 1)
+      {
+         print("start_messung start")
+         teensy.write_byteArray[0] = UInt8(MESSUNG_START)
+         
+         teensy.write_byteArray[1] = UInt8(SAVE_SD_RUN)
+         // Abschnitt auf SD
+         teensy.write_byteArray[ABSCHNITT_BYTE] = 0
+         
+         //Angabe zum  Startblock lesen. default ist 0
+         let startblock = write_sd_startblock.integerValue
+         teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
+         teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+         let zeit = tagsekunde()
+         print("start_messung zeit: \(zeit)")
+         inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
+         Counter.intValue = 0
+      }
+      else
+      {
+         print("start_messung stop")
+         teensy.write_byteArray[0] = UInt8(MESSUNG_STOP)
+         teensy.write_byteArray[1] = UInt8(SAVE_SD_STOP)
+         
+         teensy.read_OK = false
+         usb_read_cont = false
+         cont_read_check.state = 0;
+         
+         print("DiagrammDataArray: \(DiagrammDataArray)")
+         
+         let messungstring:String = MessungDataString(data:DiagrammDataArray)
+         
+         let prefix = datumprefix()
+         let dataname = prefix + "_messungdump.txt"
+         
+         writeData(name: dataname,data:messungstring)
+         
+         //   let MessungDataString = DiagrammDataArray.map{String($0)}.joined(separator: "\n")
+         /*
+          print("messungstring: \(messungstring)\n")
+          let erfolg = saveData(data: messungstring)
+          if (erfolg == 0)
+          {
+          print("MessData sichern OK")
+          NSSound(named: "Glass")?.play()
+          }
+          else
+          {
+          print("MessData sichern misslungen")
+          
+          }
+          */
+      }
+      
+      var senderfolg = teensy.start_write_USB()
+      if (senderfolg > 0)
+      {
+         NSSound(named: "Glass")?.play()
+      }
+      
+   }
 
    
    @IBAction func SaveResBut(sender: AnyObject)
