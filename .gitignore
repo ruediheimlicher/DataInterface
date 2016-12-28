@@ -1,6 +1,5 @@
 Images.*
 *Tests*
-*.lproj
 *.xcodeproj
 *.eep
 *.elf
