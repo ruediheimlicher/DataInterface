@@ -552,6 +552,42 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    }
 
    
+   @IBAction func report_cont_write(_ sender: AnyObject)
+   {
+      NSSound(named: "Glass")?.play()
+      
+      if (sender.state == 0)
+      {
+         usb_write_cont = false
+      }
+      else
+      {
+         usb_write_cont = true
+      }
+      //println("report_cont_write usb_write_cont: \(usb_write_cont)")
+   }
+   
+   
+   @IBAction func report_cont_read(_ sender: AnyObject)
+   {
+      //audioPlayer.play()
+      NSSound(named: "Glass")?.play()
+      let systemSoundID: SystemSoundID = 1016
+      AudioServicesPlaySystemSound (systemSoundID)
+      if (sender.state == 0)
+      {
+         usb_read_cont = false
+      }
+      else
+      {
+         usb_read_cont = true
+      }
+      //println("report_cont_read usb_read_cont: \(usb_read_cont)")
+   }
+   
+   
+   
+    
    @IBAction func SaveResBut(sender: AnyObject)
    {
       // https://eclecticlight.co/2016/12/23/more-fun-scripting-with-swift-and-xcode-alerts-and-file-save/
