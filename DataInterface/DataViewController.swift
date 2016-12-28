@@ -98,6 +98,13 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    
    var swiftArray = [[String:AnyObject]]()
+   
+   
+   // Diagramm
+   @IBOutlet  var datagraph: DataPlot!
+   @IBOutlet  var dataScroller: NSScrollView!
+   @IBOutlet  var dataAbszisse: Abszisse!
+
 
    @IBOutlet weak var save_SD_check: NSButton!
    @IBOutlet weak var Start_Messung: NSButton!
