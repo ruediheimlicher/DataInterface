@@ -389,7 +389,454 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       return datastring
    }
    
+   //MARK: - viewDidLoad
+   override func viewDidLoad()
+   {
+      super.viewDidLoad()
+      
+      // Notific einrichten
+      NotificationCenter.default.addObserver(self, selector: #selector(DataViewController.USBfertigAktion(_:)), name: NSNotification.Name(rawValue: "NSWindowWillCloseNotification"), object: nil)
+      
+      // http://dev.iachieved.it/iachievedit/notifications-and-userinfo-with-swift-3-0/
+      
+      let nc = NotificationCenter.default //
+      
+      nc.addObserver(forName:Notification.Name(rawValue:"newdata"),// Name im Aufruf in usb.swift
+         object:nil, queue:nil,
+         using:newLoggerDataAktion)
 
+   }//viewDidLoad
+   // ****************************************************************************
+   //MARK: -   newLoggerDataAktion
+   // ****************************************************************************
+   // http://dev.iachieved.it/iachievedit/notifications-and-userinfo-with-swift-3-0/
+   
+   func newLoggerDataAktion(notification:Notification) -> Void
+   {
+      //print("ViewController newLoggerDataAktion info: \(notification.name)")
+      //print("ViewController newLoggerDataAktion  userinfo data: \(notification.userInfo?["data"])");
+      
+      tagsec_Feld.integerValue = tagsekunde()
+      teensy.new_Data = false
+      // NSBeep()
+      let code:Int = Int(teensy.read_byteArray[0])
+      let codestring = int2hex(UInt8(code))
+      //print("newLoggerDataAktion code: \(code) \(codestring)")
+      
+      switch (code)
+      {
+         // ****************************************************************************
+         //MARK: LOGGER_SETTINGS
+      // ****************************************************************************
+      case LOGGER_SETTING:
+         print("LOGGER_SETTINGS:")
+         print("Nr: \(teensy.last_read_byteArray[DATACOUNT_LO]) \(teensy.last_read_byteArray[DATACOUNT_HI]) ")
+         
+         // ****************************************************************************
+         //MARK: LOGGER_START
+      // ****************************************************************************
+      case LOGGER_START: // Antwort auf LOGGER_START, Block geladen
+         
+         print("newLoggerDataAktion logger start: \(code)")
+         
+         // ladefehler
+         let readerr: UInt8 = teensy.last_read_byteArray[1] // fehler ist im Byte 1
+         
+         
+         print("newLoggerDataAktion LOGGER_START: \(code)\t readerr: \(readerr)")
+         if (readerr == 0)
+         {
+            print("newLoggerDataAktion LOGGER_START: OK")
+            
+            packetcount = 0
+            cont_log_USB(paketcnt: (packetcount))
+         }
+         else
+         {
+            print("newLoggerDataAktion LOGGER_START: Error")
+         }
+         // ****************************************************************************
+         //MARK: LOGGER_CONT
+      // ****************************************************************************
+      case LOGGER_CONT:
+         /*
+          
+          */
+         
+         //print("newLoggerDataAktion logger cont: \(code)")
+         let packetcount: UInt8 = teensy.last_read_byteArray[3]
+         print("newLoggerDataAktion LOGGER_CONT: \(code)\t packetcount: \(packetcount)")
+         
+         // gelesene Daten
+         
+         var ind = 0
+         
+         //print("LOGGER_CONT read_byteArray:")
+         
+         //var loggerstring:String
+         if (teensy.last_read_byteArray.count > 1)
+         {
+            // http://stackoverflow.com/questions/25581324/swift-how-can-string-join-work-custom-types
+            
+            print("Kontrolle teensy.last_read_byteArray\n")
+            for  index in 0..<BUFFER_SIZE
+            {
+               
+               //    print("\(teensy.last_read_byteArray[index])", terminator: "\t")
+            }
+            
+            var temparray = teensy.last_read_byteArray[DATA_START_BYTE...(BUFFER_SIZE-1)] // Teilarray mit Daten
+            let anz = temparray.count
+            var index = 0
+            // hi und lo zusammenfuegen, neu speichern
+            var newzeilenarray:[UInt16]! = []
+            while (index < temparray.count / 2)
+            {
+               
+               //let bb = teensy.read_byteArray[DATA_START_BYTE + 2 * index]
+               //let aa = teensy.read_byteArray[DATA_START_BYTE + 2 * index + 1]
+               
+               let a:UInt16 = UInt16(teensy.read_byteArray[DATA_START_BYTE + 2 * index])
+               let b:UInt16 = UInt16(teensy.read_byteArray[DATA_START_BYTE + 2 * index + 1])
+               
+               var tempwert:UInt16 = a | (b << 8)
+               // tempwert = a + b * 0xff
+               
+               newzeilenarray.append(tempwert)
+               index += 1
+               if ((index > 0) && (index%8 == 0))
+               {
+                  //   print ("\nindex: \(index) newzeilenarray: \n\(newzeilenarray)")
+                  let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
+                  inputDataFeld.string = inputDataFeld.string! + "\n" + tempstring
+                  newzeilenarray.removeAll(keepingCapacity: true)
+                  
+               }
+               // hi und lo zusammenfuehren
+               //         index += 1
+            }
+            //           print ("\nnewzeilenarray: \n\(newzeilenarray)")
+            // http://useyourloaf.com/blog/swift-guide-to-map-filter-reduce/
+            
+            //            let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
+            
+            
+            //var tempstring = teensy.last_read_byteArray.map{Strng($0)}.joined(separator: ",")
+            
+            // http://stackoverflow.com/questions/36076014/uint8-array-to-strings-in-swift
+            //    let stringArray = teensy.last_read_byteArray.map( { "\($0)" })
+            //     print(stringArray)
+            // let tempstring = String(bytes: teensy.last_read_byteArray, encoding: String.Encoding.utf8)
+            
+            //           inputDataFeld.string = inputDataFeld.string! + "\n" + tempstring
+         }
+         
+         print("LOGGER_CONT teensy.last_read_byteArray packetcount: \(packetcount)\n\(teensy.last_read_byteArray)\nend\n")
+         
+         var index=0
+         
+         // print("\(teensy.last_read_byteArray)")
+         loggerDataArray.append(teensy.last_read_byteArray);
+         
+         if (packetcount < 10)
+         {
+            
+            // Anfrage fuer naechstes Paket schicken
+            //packetcount =   packetcount + 1
+            cont_log_USB(paketcnt: (packetcount))
+            
+         }
+         else
+         {
+            // download beenden
+            teensy.read_OK = false
+            teensy.write_byteArray[0] = UInt8(LOGGER_STOP)
+            usb_read_cont = false
+            cont_read_check.state = 0;
+            let prefix = datumprefix()
+            let dataname = prefix + "_loggerdump.txt"
+            
+            writeData(name: dataname,data:inputDataFeld.string!)
+            
+            print("\n")
+            var senderfolg = teensy.start_write_USB()
+            
+            
+            //print("\nnewLoggerDataAktion LOGGER_CONT END loggerDataArray:")
+            //print ("loggerDataArray packetcount: \(packetcount):\n\(loggerDataArray)*")
+            
+         }
+         // ****************************************************************************
+         //MARK: LOGGER_STOP
+         // ****************************************************************************
+         
+      case LOGGER_STOP:
+         
+         packetcount = 0
+         print("\nLOGGER_STOP")
+         
+         teensy.read_OK = false
+         teensy.write_byteArray[0] = UInt8(LOGGER_STOP)
+         usb_read_cont = false
+         cont_read_check.state = 0;
+         
+         let prefix = datumprefix()
+         let dataname = prefix + "_loggerdump.txt"
+         
+         writeData(name: dataname,data:inputDataFeld.string!)
+         
+         print("\n")
+         var senderfolg = teensy.start_write_USB()
+         
+         
+         print("\nnewLoggerDataAktion LOGGER_Stop loggerDataArray:")
+         print ("loggerDataArray:\n\(loggerDataArray)")
+         
+         
+         // ****************************************************************************
+      // ****************************************************************************
+      case WRITE_MMC_TEST:
+         print("code ist WRITE_MMC_TEST")
+         
+         // ****************************************************************************
+         //MARK: USB_STOP
+      // ****************************************************************************
+      case USB_STOP:
+         print("code ist USB_STOP")
+         
+         
+         // ****************************************************************************
+         //MARK: LOGGER_DATA
+      // ****************************************************************************
+      case LOGGER_DATA:
+         //print("code ist LOGGER_DATA")
+         //print(teensy.read_byteArray)
+         //print("\n\(teensy.last_read_byteArray)")
+         let counterLO = Int32(teensy.read_byteArray[DATACOUNT_LO])
+         let counterHI = Int32(teensy.read_byteArray[DATACOUNT_LO])
+         
+         let counter = (counterLO & 0x00FF) | ((counterHI & 0xFF00)>>8)
+         Counter.intValue = counter
+         let ADC0LO:Int32 =  Int32(teensy.read_byteArray[ADCLO])
+         let ADC0HI:Int32 =  Int32(teensy.read_byteArray[ADCHI])
+         
+         let adc0 = ADC0LO | (ADC0HI<<8)
+         //print("counter: \(counter) adc0: \(adc0)");
+         
+         
+         //           print ("ADC0LO: \(ADC0LO) ADC0HI: \(ADC0HI)  adc0: \(adc0)");
+         
+         // print ("adc0: \(adc0)");
+         ADCLO_Feld.intValue = ADC0LO
+         ADCHI_Feld.intValue = ADC0HI
+         
+         var  adcfloat:Float = Float(adc0) * 249 / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
+         //         print ("adcfloat: \(adcfloat)");
+         
+         adcfloat = floorf(adcfloat * Float(2)) / 2
+         
+         let NR_LO = Int32(teensy.read_byteArray[DATACOUNT_LO])
+         let NR_HI = Int32(teensy.read_byteArray[DATACOUNT_HI])
+         
+         
+         let messungnummer = NR_LO | (NR_HI<<8)
+         
+         let nrstring = String(messungnummer )
+         _ = NumberFormatter()
+         
+         print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
+         ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
+         
+         loggerDataArray.append([UInt8(ADC0LO)]);
+         var tempinputDataFeldstring = String(tagsekunde()) + "\t" +  ADCFeld.stringValue
+         
+         // Zeile in inputDataFeld laden
+         inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
+         
+         
+         let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
+         let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
+         let adc1 = ADC1LO | (ADC1HI<<8)
+         let tempzeit = tagsekunde()
+         let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
+         
+         //      DiagrammDataArray.append(datazeile)
+         
+         // datenzeile fuer Diagramm
+         var tempwerte = [Float] ( repeating: 0.0, count: 9 )
+         tempwerte[0] = Float(tempzeit) // Abszisse
+         tempwerte[1] = Float(adcfloat)
+         //tempwerte[2] = Float(adcfloat + 10)
+         //print("tempwerte: \(tempwerte)")
+         DiagrammDataArray.append(tempwerte)
+         
+         
+         //print("DiagrammDataArray: \(DiagrammDataArray)")
+         
+         // Daten einsetzen in graph
+         self.datagraph.setWerteArray(werteArray:tempwerte)
+         
+         let PlatzRechts:Float = 20.0
+         let contentwidth = Float(self.dataScroller.contentView.bounds.size.width)
+         
+         // let lastdata = self.datagraph.DatenArray.last
+         let lastxold = Float((self.datagraph.DatenArray.last?[0])!)
+         let lastx = Float((self.datagraph.DatenDicArray.last?["x"])!)
+         
+         //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
+         let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
+         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
+         
+         if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ
+         {
+            let delta = contentwidth / 10 * 8
+            
+            print("lastdata zu gross \(lastx) delta:  \(delta)")
+            self.dataScroller.documentView?.frame.origin.x -=   CGFloat(delta)
+            self.dataScroller.contentView.needsDisplay = true
+         }
+         // end data
+         
+         // ****************************************************************************
+         // ****************************************************************************
+         
+      default: break
+         //print("code ist 0")
+      } // switch code
+      //return;
+      
+      var data = NSData(bytes: teensy.last_read_byteArray, length: 64)
+      //print("data: \(data)")
+      
+      // let inputDataFeldstring = teensy.last_read_byteArray as NSArray
+      
+      let b1: Int32 = Int32(teensy.last_read_byteArray[1])
+      let b2: Int32 = Int32(teensy.last_read_byteArray[2])
+      
+      //print("b1: \(b1)\tb2: \(b2)\n");
+      
+      H_Feld.intValue = b2
+      H_Feld.stringValue = NSString(format:"%2X", b1) as String
+      
+      // H_Feld.stringValue = NSString(format:"%d", a2)
+      
+      L_Feld.intValue = b1
+      L_Feld.stringValue = NSString(format:"%2X", b1) as String
+      // L_Feld.stringValue = NSString(format:"%d", a1)
+      
+      let rotA:Int32 = (b1 | (b2<<8))
+      
+      //inputDataFeldFeld.stringValue = NSString(format:"%2X", rotA)
+      inputDataFeldFeld.intValue = Int32(rotA)
+      
+      spannungsanzeige.intValue = Int32(rotA )
+      
+      
+      // DS18S20
+      
+      let DSLOW:Int16 = Int16(teensy.last_read_byteArray[DSLO])
+      let DSHIGH:Int16 = Int16(teensy.last_read_byteArray[DSHI])
+      
+      if (DSLOW > 0)
+      {
+         let temperatur = DSLOW | (DSHIGH<<8)
+         
+         print("DSLOW: \(DSLOW)\tSDHIGH: \(DSHIGH) temperatur: \(temperatur)\n");
+         
+         DSLO_Feld.intValue = Int32(DSLOW)
+         DSHI_Feld.intValue = Int32(DSHIGH)
+         
+         let  temperaturfloat:Float = Float(temperatur)/10.0
+         _ = NumberFormatter()
+         
+         let t:NSString = NSString(format:"%.01f", temperaturfloat) as String as String as NSString
+         print("temperaturfloat: \(temperaturfloat) String: \(t)");
+         DSTempFeld.stringValue = NSString(format:"%.01f°C", temperaturfloat) as String
+         //DSTempFeld.floatValue = temperaturfloat
+      }
+      
+      // mmc
+      let mmcLO:Int32 = Int32(teensy.last_read_byteArray[MMCLO])
+      let mmcHI:Int32 = Int32(teensy.last_read_byteArray[MMCHI])
+      let mmcData  = mmcLO | (mmcHI << 8)
+      mmcLOFeld.intValue = mmcLO
+      mmcHIFeld.intValue = mmcHI
+      mmcDataFeld.intValue = mmcData
+      teensy.new_Data = false
+      
+   }
+   
+   //MARK: cont log
+   func cont_log_USB(paketcnt: UInt8)
+   {
+      
+      print("\ncont_log_USB packetcount: \(paketcnt)");
+      teensy.write_byteArray[0] = UInt8(LOGGER_CONT) // code
+      startblock = 4;
+      // index erster Block
+      teensy.write_byteArray[1] = UInt8(startblock & 0x00FF)
+      teensy.write_byteArray[2] = UInt8((startblock & 0xFF00)>>8)
+      /*
+       teensy.write_byteArray[3] =  UInt8(blockcount  & 0x00FF)
+       teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
+       */
+      teensy.write_byteArray[3] = paketcnt // beginn bei Paket next
+      
+      var senderfolg = teensy.cont_write_USB()
+      
+   }
+   
+   
+   
+   @IBAction func report_stop_log_USB(_ sender: AnyObject)
+   {
+      print("report_stop_log_USB");
+      teensy.write_byteArray[0] = UInt8(LOGGER_STOP)
+      
+      var senderfolg = teensy.cont_write_USB()
+      cont_read_check.state = 1
+      
+      
+   }
+   
+
+   
+   func USBfertigAktion(_ sender: AnyObject)-> Bool
+   {
+      NSLog("USBfertigAktion will schliessen")
+      
+      stop_read_USB(self)
+      stop_write_USB(self)
+      
+      teensycode &= ~(1<<7)
+      teensy.write_byteArray[15] = teensycode
+      teensy.write_byteArray[0] = UInt8(USB_STOP)
+      //    teensy.write_byteArray[1] = UInt8(data0.intValue)
+      
+      let senderfolg = teensy.start_write_USB()
+      if (senderfolg > 0)
+      {
+         NSApplication.shared().terminate(self)
+         return true
+      }
+      NSApplication.shared().terminate(self)
+      return false
+   }
+   
+   @IBAction func stop_read_USB(_ sender: AnyObject)
+   {
+      teensy.read_OK = false
+      usb_read_cont = false
+      cont_read_check.state = 0;
+      
+   }
+   
+   
+   @IBAction func stop_write_USB(_ sender: AnyObject)
+   {
+      usb_write_cont = false
+      cont_write_check.state = 0;
+   }
 
 
   //MARK: - Konfig Messung
@@ -585,9 +1032,20 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       //println("report_cont_read usb_read_cont: \(usb_read_cont)")
    }
    
+   open func int2hex(_ int:UInt8)->(String)
+   {
+      return String(format:"%2X", int)
+   }
    
    
-    
+   @IBAction func ExitNow(_ sender: AnyObject)
+   {
+      NSLog("ExitNow");
+      NSApplication.shared().terminate(self)
+   }
+
+   
+   
    @IBAction func SaveResBut(sender: AnyObject)
    {
       // https://eclecticlight.co/2016/12/23/more-fun-scripting-with-swift-and-xcode-alerts-and-file-save/
