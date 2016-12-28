@@ -12,3 +12,7 @@ Images.*
 *.sym
 build/*
 Power_InterfaceTests/
+*.caf
+*.mp3
+*.appiconset
+*.aif*
