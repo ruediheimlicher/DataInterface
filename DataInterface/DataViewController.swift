@@ -109,112 +109,112 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var dataAbszisse: Abszisse!
 
 
-   @IBOutlet weak var save_SD_check: NSButton!
-   @IBOutlet weak var Start_Messung: NSButton!
+   @IBOutlet  var save_SD_check: NSButton!
+   @IBOutlet  var Start_Messung: NSButton!
    
-   @IBOutlet weak var manufactorer: NSTextField!
-   @IBOutlet weak var Counter: NSTextField!
+   @IBOutlet  var manufactorer: NSTextField!
+   @IBOutlet  var Counter: NSTextField!
    
-   @IBOutlet weak var Start: NSButton!
+   @IBOutlet  var Start: NSButton!
    
-   @IBOutlet weak var inputDataFeldFeld: NSTextField!
+   @IBOutlet  var inputDataFeldFeld: NSTextField!
    
-   @IBOutlet weak var USB_OK: NSTextField!
+   @IBOutlet  var USB_OK: NSTextField!
    
-   @IBOutlet weak var start_read_USB_Knopf: NSButton!
-   @IBOutlet weak var stop_read_USB_Knopf: NSButton!
-   @IBOutlet weak var cont_read_check: NSButton!
+   @IBOutlet  var start_read_USB_Knopf: NSButton!
+   @IBOutlet  var stop_read_USB_Knopf: NSButton!
+   @IBOutlet  var cont_read_check: NSButton!
    
-   @IBOutlet weak var start_write_USB_Knopf: NSButton!
-   @IBOutlet weak var stop_write_USB_Knopf: NSButton!
-   @IBOutlet weak var cont_write_check: NSButton!
+   @IBOutlet  var start_write_USB_Knopf: NSButton!
+   @IBOutlet  var stop_write_USB_Knopf: NSButton!
+   @IBOutlet  var cont_write_check: NSButton!
    
    
-   @IBOutlet weak var codeFeld: NSTextField!
+   @IBOutlet  var codeFeld: NSTextField!
    
-   @IBOutlet weak var data0: NSTextField!
+   @IBOutlet  var data0: NSTextField!
    
-   @IBOutlet weak var data1: NSTextField!
+   @IBOutlet  var data1: NSTextField!
    
    @IBOutlet  var inputDataFeld: NSTextView!
    
-   @IBOutlet weak var write_sd_startblock: NSTextField!
-   @IBOutlet weak var write_sd_anzahl: NSTextField!
-   @IBOutlet weak var read_sd_startblock: NSTextField!
-   @IBOutlet weak var read_sd_anzahl: NSTextField!
+   @IBOutlet  var write_sd_startblock: NSTextField!
+   @IBOutlet  var write_sd_anzahl: NSTextField!
+   @IBOutlet  var read_sd_startblock: NSTextField!
+   @IBOutlet  var read_sd_anzahl: NSTextField!
    
    @IBOutlet  var downloadDataFeld: NSTextView!
    
    
-   @IBOutlet weak var data2: NSTextField!
-   @IBOutlet weak var data3: NSTextField!
+   @IBOutlet  var data2: NSTextField!
+   @IBOutlet  var data3: NSTextField!
    
    
-   @IBOutlet weak var H_Feld: NSTextField!
+   @IBOutlet  var H_Feld: NSTextField!
    
-   @IBOutlet weak var L_Feld: NSTextField!
+   @IBOutlet  var L_Feld: NSTextField!
    
-   @IBOutlet weak var spannungsanzeige: NSSlider!
-   @IBOutlet weak var extspannungFeld: NSTextField!
+   @IBOutlet  var spannungsanzeige: NSSlider!
+   @IBOutlet  var extspannungFeld: NSTextField!
    
-   @IBOutlet weak var spL: NSTextField!
-   @IBOutlet weak var spH: NSTextField!
+   @IBOutlet  var spL: NSTextField!
+   @IBOutlet  var spH: NSTextField!
    
-   @IBOutlet weak var extstrom: NSTextField!
-   @IBOutlet weak var Teensy_Status: NSButton!
+   @IBOutlet  var extstrom: NSTextField!
+   @IBOutlet  var Teensy_Status: NSButton!
    
    
-   @IBOutlet weak var extspannungStepper: NSStepper!
+   @IBOutlet  var extspannungStepper: NSStepper!
    
    
    // Datum
-   @IBOutlet weak var sec_Feld: NSTextField!
-   @IBOutlet weak var min_Feld: NSTextField!
-   @IBOutlet weak var std_Feld: NSTextField!
-   @IBOutlet weak var wt_Feld: NSTextField!
-   @IBOutlet weak var mon_Feld: NSTextField!
-   @IBOutlet weak var jahr_Feld: NSTextField!
-   @IBOutlet weak var datum_Feld: NSTextField!
-   @IBOutlet weak var zeit_Feld: NSTextField!
-   @IBOutlet weak var tagsec_Feld: NSTextField!
-   @IBOutlet weak var tagmin_Feld: NSTextField!
+   @IBOutlet  var sec_Feld: NSTextField!
+   @IBOutlet  var min_Feld: NSTextField!
+   @IBOutlet  var std_Feld: NSTextField!
+   @IBOutlet  var wt_Feld: NSTextField!
+   @IBOutlet  var mon_Feld: NSTextField!
+   @IBOutlet  var jahr_Feld: NSTextField!
+   @IBOutlet  var datum_Feld: NSTextField!
+   @IBOutlet  var zeit_Feld: NSTextField!
+   @IBOutlet  var tagsec_Feld: NSTextField!
+   @IBOutlet  var tagmin_Feld: NSTextField!
    
    
-   @IBOutlet weak var DSLO_Feld: NSTextField!
-   @IBOutlet weak var DSHI_Feld: NSTextField!
-   @IBOutlet weak var DSTempFeld: NSTextField!
+   @IBOutlet  var DSLO_Feld: NSTextField!
+   @IBOutlet  var DSHI_Feld: NSTextField!
+   @IBOutlet  var DSTempFeld: NSTextField!
    
    // ADC
-   @IBOutlet weak var ADCLO_Feld: NSTextField!
-   @IBOutlet weak var ADCHI_Feld: NSTextField!
-   @IBOutlet weak var ADCFeld: NSTextField!
+   @IBOutlet  var ADCLO_Feld: NSTextField!
+   @IBOutlet  var ADCHI_Feld: NSTextField!
+   @IBOutlet  var ADCFeld: NSTextField!
    
-   @IBOutlet weak var ServoASlider: NSSlider!
+   @IBOutlet  var ServoASlider: NSSlider!
    
    // Logging
-   @IBOutlet weak var Start_Logger: NSButton!
-   @IBOutlet weak var Stop_Logger: NSButton!
+   @IBOutlet  var Start_Logger: NSButton!
+   @IBOutlet  var Stop_Logger: NSButton!
    
    
    // Einstellungen
-   @IBOutlet weak var IntervallPop: NSComboBox!
-   @IBOutlet weak  var TaskListe: NSTableView!
-   @IBOutlet weak var Set_Settings: NSButton!
+   @IBOutlet  var IntervallPop: NSComboBox!
+   @IBOutlet   var TaskListe: NSTableView!
+   @IBOutlet  var Set_Settings: NSButton!
    
    // USB-code
-   @IBOutlet weak var bit0_check: NSButton!
-   @IBOutlet weak var bit1_check: NSButton!
-   @IBOutlet weak var bit2_check: NSButton!
-   @IBOutlet weak var bit3_check: NSButton!
-   @IBOutlet weak var bit4_check: NSButton!
-   @IBOutlet weak var bit5_check: NSButton!
-   @IBOutlet weak var bit6_check: NSButton!
-   @IBOutlet weak var bit7_check: NSButton!
+   @IBOutlet  var bit0_check: NSButton!
+   @IBOutlet  var bit1_check: NSButton!
+   @IBOutlet  var bit2_check: NSButton!
+   @IBOutlet  var bit3_check: NSButton!
+   @IBOutlet  var bit4_check: NSButton!
+   @IBOutlet  var bit5_check: NSButton!
+   @IBOutlet  var bit6_check: NSButton!
+   @IBOutlet  var bit7_check: NSButton!
    
    // mmc
-   @IBOutlet weak var mmcLOFeld: NSTextField!
-   @IBOutlet weak var mmcHIFeld: NSTextField!
-   @IBOutlet weak var mmcDataFeld: NSTextField!
+   @IBOutlet  var mmcLOFeld: NSTextField!
+   @IBOutlet  var mmcHIFeld: NSTextField!
+   @IBOutlet  var mmcDataFeld: NSTextField!
    
    
    open func writeData(name:String, data:String)
@@ -395,11 +395,16 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       super.viewDidLoad()
       
       // Notific einrichten
-      NotificationCenter.default.addObserver(self, selector: #selector(DataViewController.USBfertigAktion(_:)), name: NSNotification.Name(rawValue: "NSWindowWillCloseNotification"), object: nil)
+//      NotificationCenter.default.addObserver(self, selector: #selector(DataViewController.USBfertigAktion(_:)), name: NSNotification.Name(rawValue: "NSWindowWillCloseNotification"), object: nil)
       
       // http://dev.iachieved.it/iachievedit/notifications-and-userinfo-with-swift-3-0/
       
       let nc = NotificationCenter.default //
+ 
+      nc.addObserver(forName:Notification.Name(rawValue:"NSWindowWillCloseNotification"),// Name im Aufruf in usb.swift
+         object:nil, queue:nil,
+         using:USBfertigAktion)
+
       
       nc.addObserver(forName:Notification.Name(rawValue:"newdata"),// Name im Aufruf in usb.swift
          object:nil, queue:nil,
@@ -799,11 +804,152 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
    }
    
-
-   
-   func USBfertigAktion(_ sender: AnyObject)-> Bool
+   @IBAction func reportWriteCodeBit(_ sender: AnyObject)
    {
-      NSLog("USBfertigAktion will schliessen")
+      print("reportBit1 tag: \(sender.tag)")
+      let bit:UInt8 = UInt8(sender.tag)
+      if (sender.state == 1)
+      {
+         usbstatus |= (1<<bit)
+      }
+      else
+      {
+         usbstatus &= ~(1<<bit)
+      }
+      codeFeld.intValue = Int32(usbstatus)
+   }
+   
+   @IBAction func sendServoA(_ sender: AnyObject)
+   {
+      
+      var formatter = NumberFormatter()
+      var tempspannung:Double  = extspannungFeld.doubleValue * 100
+      if (tempspannung > 3000)
+      {
+         tempspannung = 3000
+         
+         
+      }
+      
+      let tempPos = ServoASlider.intValue
+      
+      //      extspannungFeld.doubleValue = ((tempspannung/100)+1)%12
+      //var tempintspannung = UInt16(tempspannung)
+      //NSString(format:"%2X", a2)
+      //spL.stringValue = NSString(format:"%02X", (tempintspannung & 0x00FF)) as String
+      //spH.stringValue = NSString(format:"%02X", ((tempintspannung & 0xFF00)>>8)) as String
+      print("tempPos: \(tempPos)");// L: \(spL.stringValue)\ttempintspannung H: \(spH.stringValue) ")
+      //teensy.write_byteArray[0] = 0x01
+      print("write_byteArray 0: \(teensy.write_byteArray[0])")
+      teensy.write_byteArray[10] = UInt8(tempPos & (0x00FF))
+      teensy.write_byteArray[11] = UInt8((tempPos & (0xFF00))>>8)
+      print("write_byteArray 10: \(teensy.write_byteArray[10])\t 11: \(teensy.write_byteArray[11])")
+      var senderfolg = teensy.start_write_USB()
+      teensy.write_byteArray[0] = 0x00 // bit 0 zuruecksetzen
+      //senderfolg = teensy.report_start_write_USB()
+   }
+   
+   
+   
+   @IBAction func sendSpannung(_ sender: AnyObject)
+   {
+      
+      var formatter = NumberFormatter()
+      var tempspannung:Double  = extspannungFeld.doubleValue * 100
+      if (tempspannung > 3000)
+      {
+         tempspannung = 3000
+         
+         
+      }
+      //      extspannungFeld.doubleValue = ((tempspannung/100)+1)%12
+      let tempintspannung = UInt16(tempspannung)
+      //NSString(format:"%2X", a2)
+      spL.stringValue = NSString(format:"%02X", (tempintspannung & 0x00FF)) as String
+      spH.stringValue = NSString(format:"%02X", ((tempintspannung & 0xFF00)>>8)) as String
+      print("tempintspannung L: \(spL.stringValue)\ttempintspannung H: \(spH.stringValue) ")
+      teensy.write_byteArray[0] = 0x01
+      print("write_byteArray 0: \(teensy.write_byteArray[0])")
+      teensy.write_byteArray[1] = UInt8(tempintspannung & (0x00FF))
+      teensy.write_byteArray[2] = UInt8((tempintspannung & (0xFF00))>>8)
+      
+      var senderfolg = teensy.start_write_USB()
+      teensy.write_byteArray[0] = 0x00 // bit 0 zuruecksetzen
+      //senderfolg = teensy.report_start_write_USB()
+   }
+   
+   func setSpannung()
+   {
+      var beepSound = URL(fileURLWithPath: Bundle.main.path(forResource: "beep", ofType: "aif")!)
+      
+      
+      var formatter = NumberFormatter()
+      var tempspannung:Double  = extspannungFeld.doubleValue * 100
+      if (tempspannung > 3000)
+      {
+         tempspannung = 3000
+         
+         
+      }
+      //      extspannungFeld.doubleValue = ((tempspannung/100)+1)%12
+      let tempintspannung = UInt16(tempspannung)
+      //NSString(format:"%2X", a2)
+      spL.stringValue = NSString(format:"%02X", (tempintspannung & 0x00FF)) as String
+      spH.stringValue = NSString(format:"%02X", ((tempintspannung & 0xFF00)>>8)) as String
+      print("tempintspannung L: \(spL.stringValue)\ttempintspannung H: \(spH.stringValue) ")
+      teensy.write_byteArray[0] = 0x01
+      print("write_byteArray 0: \(teensy.write_byteArray[0])")
+      teensy.write_byteArray[1] = UInt8(tempintspannung & (0x00FF))
+      teensy.write_byteArray[2] = UInt8((tempintspannung & (0xFF00))>>8)
+      
+      var senderfolg = teensy.start_write_USB()
+      teensy.write_byteArray[0] = 0x00 // bit 0 zuruecksetzen
+      //senderfolg = teensy.report_start_write_USB()
+   }
+   
+   
+   
+   @IBAction func sendStrom(_ sender: AnyObject)
+   {
+      var formatter = NumberFormatter()
+      var tempstrom:Double  = extstrom.doubleValue * 100
+      if (tempstrom > 3000)
+      {
+         tempstrom = 3000
+         
+      }
+      let ired = NSString(format:"%2.2f", tempstrom/100)
+      extstrom.stringValue = ired as String
+      let tempintstrom = UInt16(tempstrom)
+      //NSString(format:"%2X", a2)
+      spL.stringValue = NSString(format:"%02X", (tempintstrom & 0x00FF)) as String
+      spH.stringValue = NSString(format:"%02X", ((tempintstrom & 0xFF00)>>8)) as String
+      print("tempintstrom L: \(spL.stringValue)\ttempintstrom H: \(spH.stringValue) ")
+      teensy.write_byteArray[0] = 0x02
+      print("write_byteArray 0: \(teensy.write_byteArray[0])")
+      teensy.write_byteArray[1] = UInt8(tempintstrom & (0x00FF))
+      teensy.write_byteArray[2] = UInt8((tempintstrom & (0xFF00))>>8)
+      
+      var senderfolg = teensy.start_write_USB()
+      teensy.write_byteArray[0] = 0x00
+   }
+   
+
+   func USBfertigAktion(notification:Notification) -> Void
+   {
+      NSLog("USBfertigAktion will schliessen \(notification)")
+      let appDelegate = NSApplication.shared().delegate as? AppDelegate
+      let hauptfenster:NSWindow = (appDelegate?.window)!
+      let objektfenster :NSWindow = notification.object as! NSWindow
+      if (hauptfenster == objektfenster)
+      {
+         print("hauptfenster")
+      }
+      else
+      {
+         print("dialogfenster")
+         return;
+      }
       
       stop_read_USB(self)
       stop_write_USB(self)
@@ -811,16 +957,20 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       teensycode &= ~(1<<7)
       teensy.write_byteArray[15] = teensycode
       teensy.write_byteArray[0] = UInt8(USB_STOP)
-      //    teensy.write_byteArray[1] = UInt8(data0.intValue)
+      teensy.write_byteArray[1] = UInt8(data0.intValue)
       
       let senderfolg = teensy.start_write_USB()
       if (senderfolg > 0)
       {
+         print("USBfertigAktion teensy schliessen OK")
          NSApplication.shared().terminate(self)
-         return true
+         return
       }
+      
+      print("USBfertigAktion teensy schliessen nicht OK")
       NSApplication.shared().terminate(self)
-      return false
+      return
+ 
    }
    
    @IBAction func stop_read_USB(_ sender: AnyObject)
@@ -1049,7 +1199,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBAction func SaveResBut(sender: AnyObject)
    {
       // https://eclecticlight.co/2016/12/23/more-fun-scripting-with-swift-and-xcode-alerts-and-file-save/
-      let fileContentToWrite = inputDataFeld.string
+      var fileContentToWrite:String = (inputDataFeld.string)!
+      if (fileContentToWrite.characters.count == 0)
+      {
+         fileContentToWrite = "empty file"
+      }
       //and so on to build the text to be written out to the file
       let FS = NSSavePanel()
       FS.canCreateDirectories = true
@@ -1059,7 +1213,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          if result == NSFileHandlingPanelOKButton {
             guard let url = FS.url else { return }
             do {
-               try fileContentToWrite?.write(to: url, atomically: false, encoding: String.Encoding.utf8)
+               try fileContentToWrite.write(to: url, atomically: false, encoding: String.Encoding.utf8)
             } catch {
                print (error.localizedDescription)
                //we should really have an error alert here instead
