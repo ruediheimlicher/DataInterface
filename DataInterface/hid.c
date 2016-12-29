@@ -248,11 +248,16 @@ int rawhid_send(int num, void *buf, int len, int timeout)
 	int result=-100;
    
 	hid = get_hid(num);
-	if (!hid || !hid->open) return -1;
+   
+	if (!hid || !hid->open)
+   {
+      free((void*)reportData);
+      return -1;
+   }
    //fprintf(stderr,"rawhid_send A\n");
 #if 1
 #warning "Send timeout not implemented on MACOSX"
-   uint8_t report[64] = {0x0};
+  // uint8_t report[64] = {0x0};
    
    //http://opensource.apple.com/tarballs/IOUSBFamily/
    
@@ -283,7 +288,7 @@ int rawhid_send(int num, void *buf, int len, int timeout)
 
    IOHIDDeviceSetReport(hid->ref, kIOHIDReportTypeOutput,
                                     0, buf, len);
-fprintf(stderr,"rawhid_send D\n");
+   fprintf(stderr,"rawhid_send D\n");
 	while (1) 
    {
 		fprintf(stderr,"enter run loop (send)\n");
