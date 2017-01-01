@@ -472,9 +472,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //print("newLoggerDataAktion logger cont: \(code)")
          
          // old
-         let packetcount: UInt8 = teensy.last_read_byteArray[3]
+         //let packetcount: UInt8 = teensy.last_read_byteArray[3]
          
-        // let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
+         let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
          print("newLoggerDataAktion LOGGER_CONT: \(code)\t packetcount: \(packetcount)")
          
          // gelesene Daten
@@ -809,7 +809,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
        teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
        */
       packetcount=0
-      teensy.write_byteArray[3] = packetcount // beginn bei Paket 0
+      teensy.write_byteArray[PACKETCOUNT_BYTE] = packetcount // beginn bei Paket 0
       
       // cont write aktivieren
       cont_write_check.state = 1
@@ -836,7 +836,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
        */
       
       // old
-      teensy.write_byteArray[3] = paketcnt // beginn bei Paket next
+      teensy.write_byteArray[PACKETCOUNT_BYTE] = paketcnt // beginn bei Paket next
 
       
      // teensy.write_byteArray[PACKETCOUNT_BYTE] = paketcnt // beginn bei Paket next
@@ -1300,7 +1300,12 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    func cont_write_USB(_ timer: Timer)
    {
-      print("*** \tcont_write usb: \(usb_write_cont)")
+      print("*** \tcont_write usb deakt: \(usb_write_cont)")
+      
+      return
+      
+      
+      
       // if (usb_write_cont)
       if (cont_write_check.state == 1)
       {
@@ -1385,8 +1390,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("Fehler in start_read_usb")
       }
       
-      let DSLOW:Int32 = Int32(teensy.read_byteArray[DSLO])
+      var DSLOW:Int32 = Int32(teensy.read_byteArray[DSLO])
       let DSHIGH:Int32 = Int32(teensy.read_byteArray[DSHI])
+      
+      DSLOW = 0
       
       if (DSLOW > 0)
       {
@@ -1443,9 +1450,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBAction func report_cont_read(_ sender: AnyObject)
    {
       //audioPlayer.play()
-      NSSound(named: "Glass")?.play()
-      let systemSoundID: SystemSoundID = 1016
-      AudioServicesPlaySystemSound (systemSoundID)
+//      NSSound(named: "Glass")?.play()
+
+      //      let systemSoundID: SystemSoundID = 1016
+//      AudioServicesPlaySystemSound (systemSoundID)
       if (sender.state == 0)
       {
          usb_read_cont = false
