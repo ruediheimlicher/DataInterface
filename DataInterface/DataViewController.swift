@@ -50,7 +50,7 @@ let ABSCHNITT_BYTE   =     2 // Abschnitt auf SD
 let BLOCKOFFSETLO_BYTE    =     3 // Block auf SD fuer Sicherung
 let BLOCKOFFSETHI_BYTE    =     4
 
-
+let PACKETCOUNT_BYTE = 8
 
 let TAKT_LO_BYTE = 14
 let TAKT_HI_BYTE = 15
@@ -67,7 +67,7 @@ let LOGGER_CONT = 0xA1
 let LOGGER_STOP = 0xAF
 
 let LOGGER_SETTING    =  0xB0 // Setzen der Settings fuer die Messungen
-let LOGGER_DATA    =  0xB1 // Setzen der Settings fuer die Messungen
+let MESSUNG_DATA    =  0xB1 // Setzen der Settings fuer die Messungen
 
 let USB_STOP    = 0xAA
 
@@ -142,6 +142,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    @IBOutlet  var write_sd_anzahl: NSTextField!
    @IBOutlet  var read_sd_startblock: NSTextField!
    @IBOutlet  var read_sd_anzahl: NSTextField!
+
    
    @IBOutlet  var downloadDataFeld: NSTextView!
    
@@ -445,7 +446,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("newLoggerDataAktion logger start: \(code)")
          
          // ladefehler
-         let readerr: UInt8 = teensy.last_read_byteArray[1] // fehler ist im Byte 1
+         let readerr: UInt8 = teensy.last_read_byteArray[1] // eventueller fehler ist im Byte 1
          
          
          print("newLoggerDataAktion LOGGER_START: \(code)\t readerr: \(readerr)")
@@ -469,7 +470,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
           */
          
          //print("newLoggerDataAktion logger cont: \(code)")
+         
+         // old
          let packetcount: UInt8 = teensy.last_read_byteArray[3]
+         
+        // let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
          print("newLoggerDataAktion LOGGER_CONT: \(code)\t packetcount: \(packetcount)")
          
          // gelesene Daten
@@ -567,9 +572,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             var senderfolg = teensy.start_write_USB()
             
             
-            //print("\nnewLoggerDataAktion LOGGER_CONT END loggerDataArray:")
-            //print ("loggerDataArray packetcount: \(packetcount):\n\(loggerDataArray)*")
-            
          }
          // ****************************************************************************
          //MARK: LOGGER_STOP
@@ -611,10 +613,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          
          // ****************************************************************************
-         //MARK: LOGGER_DATA
+         //MARK: MESSUNG_DATA
       // ****************************************************************************
-      case LOGGER_DATA:
-         //print("code ist LOGGER_DATA")
+      case MESSUNG_DATA: // wird gesetzt, wenn vom Teensy im Timertakt Daten gesendet werden
+         //print("code ist MESSUNG_DATA")
          //print(teensy.read_byteArray)
          //print("\n\(teensy.last_read_byteArray)")
          let counterLO = Int32(teensy.read_byteArray[DATACOUNT_LO])
@@ -689,8 +691,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let lastx = Float((self.datagraph.DatenDicArray.last?["x"])!)
          
          //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
+         // documentView: The view the scroll view scrolls within its content view
          let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
-         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
+//         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
          
          if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ
          {
@@ -700,6 +703,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             self.dataScroller.documentView?.frame.origin.x -=   CGFloat(delta)
             self.dataScroller.contentView.needsDisplay = true
          }
+         
          // end data
          
          // ****************************************************************************
@@ -771,26 +775,77 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
    }
    
+   //MARK: -   Logger
+   @IBAction func report_start_download_logger_USB(_ sender: AnyObject)
+   {
+      
+      print("report_start_download_logger_USB");
+      Stop_Logger.isEnabled = true
+      zeit_Feld.stringValue = zeitstring()
+      // tagmin_Feld.integerValue = tagminute
+      tagsec_Feld.integerValue = tagsekunde()
+      cont_read_check.state = 1
+      usb_read_cont = (cont_read_check.state == 1)
+      let erfolg = UInt8(teensy.USBOpen())
+      if (erfolg == 0)
+      {
+         print("report_start_download_logger_USB: kein teensy da");
+         return
+      }
+      
+      teensy.write_byteArray[0] = UInt8(LOGGER_START)
+      let startblock = read_sd_startblock.integerValue
+      // index erster Block
+      
+      // old
+      teensy.write_byteArray[1] = UInt8(startblock & 0x00FF)
+      teensy.write_byteArray[2] = UInt8((startblock & 0xFF00)>>8)
+
+ //     teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF)
+ //     teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+      
+      /*
+       teensy.write_byteArray[3] =  UInt8(blockcount  & 0x00FF)
+       teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
+       */
+      packetcount=0
+      teensy.write_byteArray[3] = packetcount // beginn bei Paket 0
+      
+      // cont write aktivieren
+      cont_write_check.state = 1
+      
+      var senderfolg = teensy.start_write_USB()
+      //inputDataFeld.string = inputDataFeld.string! + "\nBlock: " + String(startblock) + "\n"
+      inputDataFeld.string = "Block: " + String(startblock) + "\n"
+      
+   }
+   
    //MARK: cont log
    func cont_log_USB(paketcnt: UInt8)
    {
       
       print("\ncont_log_USB packetcount: \(paketcnt)");
       teensy.write_byteArray[0] = UInt8(LOGGER_CONT) // code
-      startblock = 4;
+      //startblock = 4;
       // index erster Block
-      teensy.write_byteArray[1] = UInt8(startblock & 0x00FF)
-      teensy.write_byteArray[2] = UInt8((startblock & 0xFF00)>>8)
+      teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF)
+      teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
       /*
        teensy.write_byteArray[3] =  UInt8(blockcount  & 0x00FF)
        teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
        */
+      
+      // old
       teensy.write_byteArray[3] = paketcnt // beginn bei Paket next
+
+      
+     // teensy.write_byteArray[PACKETCOUNT_BYTE] = paketcnt // beginn bei Paket next
       
       var senderfolg = teensy.cont_write_USB()
       
    }
    
+
    
    
    @IBAction func report_stop_log_USB(_ sender: AnyObject)
@@ -938,12 +993,36 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    func USBfertigAktion(notification:Notification) -> Void
    {
       NSLog("USBfertigAktion will schliessen \(notification)")
+      //& http://stackoverflow.com/questions/30027780/swift-accessing-appdelegate-window-from-viewcontroller
       let appDelegate = NSApplication.shared().delegate as? AppDelegate
       let hauptfenster:NSWindow = (appDelegate?.window)!
       let objektfenster :NSWindow = notification.object as! NSWindow
       if (hauptfenster == objektfenster)
       {
          print("hauptfenster")
+         
+         stop_read_USB(self)
+         stop_write_USB(self)
+         
+         teensycode &= ~(1<<7)
+         teensy.write_byteArray[15] = teensycode
+         teensy.write_byteArray[0] = UInt8(USB_STOP)
+         
+//         teensy.write_byteArray[1] = UInt8(data0.intValue)
+         
+         let senderfolg = teensy.start_write_USB()
+         if (senderfolg > 0)
+         {
+            print("USBfertigAktion teensy schliessen OK")
+                     }
+         else
+         {
+            print("USBfertigAktion teensy schliessen nicht OK")
+            return
+         }
+         NSApplication.shared().terminate(self)
+         return
+
       }
       else
       {
@@ -951,26 +1030,48 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          return;
       }
       
-      stop_read_USB(self)
-      stop_write_USB(self)
-      
-      teensycode &= ~(1<<7)
-      teensy.write_byteArray[15] = teensycode
-      teensy.write_byteArray[0] = UInt8(USB_STOP)
-      teensy.write_byteArray[1] = UInt8(data0.intValue)
-      
-      let senderfolg = teensy.start_write_USB()
-      if (senderfolg > 0)
-      {
-         print("USBfertigAktion teensy schliessen OK")
-         NSApplication.shared().terminate(self)
-         return
-      }
-      
-      print("USBfertigAktion teensy schliessen nicht OK")
       NSApplication.shared().terminate(self)
       return
- 
+      
+   }
+   
+   @IBAction func check_USB(_ sender: NSButton)
+   {
+      let erfolg = UInt8(teensy.USBOpen())
+      usbstatus = erfolg
+      print("USBOpen erfolg: \(erfolg) usbstatus: \(usbstatus)")
+      
+      
+      if (rawhid_status()==1)
+      {
+         // NSBeep()
+         print("status 1")
+         USB_OK.textColor = NSColor.green
+         USB_OK.stringValue = "OK";
+         manufactorer.stringValue = "Manufactorer: " + teensy.manufactorer()!
+         
+         Teensy_Status.isEnabled = true;
+         start_read_USB_Knopf?.isEnabled = true;
+         stop_read_USB_Knopf?.isEnabled = true;
+         start_write_USB_Knopf?.isEnabled = true;
+         stop_write_USB_Knopf?.isEnabled = true;
+         NSSound(named: "Glass")?.play()
+         
+      }
+      else
+         
+      {
+         print("status 0")
+         USB_OK.textColor = NSColor.red
+         USB_OK.stringValue = "X";
+         Teensy_Status?.isEnabled = false;
+         start_read_USB_Knopf?.isEnabled = false;
+         stop_read_USB_Knopf?.isEnabled = false;
+         start_write_USB_Knopf?.isEnabled = false;
+         stop_write_USB_Knopf?.isEnabled = false;
+      }
+      print("antwort: \(teensy.status())")
+      
    }
    
    @IBAction func stop_read_USB(_ sender: AnyObject)
@@ -1097,10 +1198,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          //Angabe zum  Startblock lesen. default ist 0
          let startblock = write_sd_startblock.integerValue
+         
          teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
          teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
          let zeit = tagsekunde()
-         print("start_messung zeit: \(zeit)")
+         print("start_messung startblock: \(startblock)  zeit: \(zeit)")
          inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
          Counter.intValue = 0
       }
@@ -1147,23 +1249,196 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       
    }
-
    
-   @IBAction func report_cont_write(_ sender: AnyObject)
+   
+   
+   
+   @IBAction func report_start_write_USB(_ sender: AnyObject)
    {
-      NSSound(named: "Glass")?.play()
+      //NSBeep()
+      //print("report_start_write_USB code: \(codeFeld.intValue)")
+      print("report_start_write_USB code string: \(codeFeld.stringValue)")
+      let code:UInt8 = UInt8(codeFeld.stringValue, radix: 16)!
       
-      if (sender.state == 0)
+      // teensy.write_byteArray[0] = UInt8(codeFeld.intValue)
+      teensy.write_byteArray[0] = code
+      teensy.write_byteArray[DATA_START_BYTE+1] = UInt8(data0.intValue)
+      teensy.write_byteArray[DATA_START_BYTE+2] = UInt8(data1.intValue)
+      teensy.write_byteArray[DATA_START_BYTE+3] = UInt8(data2.intValue)
+      teensy.write_byteArray[DATA_START_BYTE+4] = UInt8(data3.intValue)
+      //      print("new write_byteArray in report_start_write_USB: ", terminator: "\n")
+      var i=0;
+      
+      //for  i in 0...63
+      while i < 32
       {
-         usb_write_cont = false
+         print("\(i)\t \(teensy.write_byteArray[i])\n", terminator: "")
+         i = i+1
+      }
+      print("*")
+      
+      let dateA = Date()
+      
+      var senderfolg = teensy.start_write_USB()
+      
+      
+      let dauer1 = Date() //
+      let diff =  (dauer1.timeIntervalSince(dateA))*1000
+      print("dauer report_start_write_USB: \(diff)")
+      
+      usb_write_cont = (cont_write_check.state == 1)
+      
+      //println("report_start_write_USB senderfolg: \(senderfolg)")
+      
+      
+      if (usb_write_cont)
+      {
+         var timer : Timer? = nil
+         timer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(DataViewController.cont_write_USB(_:)), userInfo: nil, repeats: true)
+      }
+   }
+   
+   func cont_write_USB(_ timer: Timer)
+   {
+      print("*** \tcont_write usb: \(usb_write_cont)")
+      // if (usb_write_cont)
+      if (cont_write_check.state == 1)
+      {
+         
+         //NSBeep()
+         //teensy.write_byteArray[0] = UInt8((codeFeld.intValue)%0xff)
+         //println("teensycode vor: \(teensycode)")
+         
+         teensycode |= UInt8((codeFeld.intValue)%0x0f)
+         print("teensycode: \(teensycode)")
+         teensy.write_byteArray[15] = teensycode
+         teensy.write_byteArray[0] = UInt8((codeFeld.intValue)%0xff)
+         
+         teensy.write_byteArray[DATA_START_BYTE+1] = UInt8((data0.intValue)%0xff)
+         teensy.write_byteArray[DATA_START_BYTE+2] = UInt8((data0.intValue)%0xff)
+         teensy.write_byteArray[DATA_START_BYTE+3] = UInt8((data0.intValue)%0xff)
+         
+         print("spannungsanzeige: \(spannungsanzeige.intValue)")
+         
+         teensy.write_byteArray[8] = UInt8((spannungsanzeige.intValue)%0xff);
+         teensy.write_byteArray[9] = UInt8(((spannungsanzeige.intValue)>>8)%0xff);
+         //print("spannungsanzeige high: \(spannungsanzeige.intValue)")
+         
+         var c0 = codeFeld.intValue + 1
+         //codeFeld.intValue = c0
+         let c1 = data0.intValue + 1
+         data0.intValue = c1
+         
+         var senderfolg = teensy.cont_write_USB()
+         
       }
       else
       {
-         usb_write_cont = true
+         timer.invalidate()
       }
-      //println("report_cont_write usb_write_cont: \(usb_write_cont)")
+      
+   }
+
+   
+   
+   
+   @IBAction func Teensy_setState(_ sender: NSButton)
+   {
+      return
+      if (sender.state > 0)
+      {
+         sender.title = "Teensy ON"
+         teensycode |= (1<<7)
+         teensy.write_byteArray[15] = teensycode
+         // teensy.write_byteArray[0] |= UInt8(Teensy_Status.intValue)
+         // teensy.write_byteArray[1] = UInt8(data0.intValue)
+         
+         var senderfolg = teensy.start_write_USB()
+         
+      }
+      else
+      {
+         sender.title = "Teensy OFF"
+         teensy.read_OK = false;
+         //teensy.write_byteArray[15] = 0
+         teensycode &= ~(1<<7)
+         teensy.write_byteArray[15] = teensycode
+         teensy.write_byteArray[0] |= UInt8(Teensy_Status.intValue)
+         teensy.write_byteArray[1] = UInt8(data0.intValue)
+         var senderfolg = teensy.start_write_USB()
+         
+      }
    }
    
+   @IBAction func start_read_USB(_ sender: AnyObject)
+   {
+      print("start_read_USB")
+      //myUSBController.startRead(1)
+      
+      usb_read_cont = (cont_read_check.state == 1) // cont_Read wird bei aktiviertem check eingeschaltet
+      teensy.write_byteArray[0] = 0
+      
+      let readerr = teensy.start_read_USB(usb_read_cont)
+      
+      if (readerr == 0)
+      {
+         print("Fehler in start_read_usb")
+      }
+      
+      let DSLOW:Int32 = Int32(teensy.read_byteArray[DSLO])
+      let DSHIGH:Int32 = Int32(teensy.read_byteArray[DSHI])
+      
+      if (DSLOW > 0)
+      {
+         let temperatur = DSLOW | (DSHIGH<<8)
+         
+         print("DSLOW: \(DSLOW)\tSDHIGH: \(DSHIGH)\n");
+         DSLO_Feld.intValue = DSLOW
+         DSHI_Feld.intValue = DSHIGH
+         let  temperaturfloat:Float = Float(temperatur)/10.0
+         _ = NumberFormatter()
+         
+         let t:NSString = NSString(format:"%.01f", temperaturfloat) as String as String as NSString
+         //print("temperaturfloat: \(temperaturfloat) String: \(t)");
+         DSTempFeld.stringValue = NSString(format:"%.01f°C", temperaturfloat) as String
+         //DSTempFeld.floatValue = temperaturfloat
+      }
+      self.datagraph.initGraphArray()
+      self.datagraph.setStartsekunde(startsekunde:tagsekunde())
+      self.datagraph.setMaxY(maxY: 100)
+      self.datagraph.setDisplayRect()
+      
+      
+      let ADC0LO:Int32 =  Int32(teensy.read_byteArray[ADCLO])
+      let ADC0HI:Int32 =  Int32(teensy.read_byteArray[ADCHI])
+      ADCLO_Feld.intValue = ADC0LO
+      ADCHI_Feld.intValue = ADC0HI
+      
+      let adc0 = ADC0LO | (ADC0HI<<8)
+      let  adcfloat:Float = Float(adc0)/0xFFFF*5.0
+      _ = NumberFormatter()
+      
+      //print("adcfloat: \(adcfloat) String: \(adcfloat)");
+      ADCFeld.stringValue = NSString(format:"%.02f", adcfloat) as String
+      
+      //print ("adc0: \(adc0)");
+      
+      //teensy.start_teensy_Timer()
+      
+      //     var somethingToPass = "It worked"
+      
+      //      let timer = NSTimer.scheduledTimerWithTimeInterval(1.0, target: self, selector: Selector("tester:"), userInfo: somethingToPass, repeats: true)
+      /*
+      if (usb_read_cont == true)
+      {
+         var timer : Timer? = nil
+         
+         // Auslesen der Ergebnisse in teensy
+  //       timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(DataViewController.cont_read_USB(_:)), userInfo: nil, repeats: true)
+      }
+ */
+   }
+
    
    @IBAction func report_cont_read(_ sender: AnyObject)
    {
@@ -1181,6 +1456,23 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       //println("report_cont_read usb_read_cont: \(usb_read_cont)")
    }
+   
+   
+   @IBAction func report_cont_write(_ sender: AnyObject)
+   {
+      NSSound(named: "Glass")?.play()
+      
+      if (sender.state == 0)
+      {
+         usb_write_cont = false
+      }
+      else
+      {
+         usb_write_cont = true
+      }
+      //println("report_cont_write usb_write_cont: \(usb_write_cont)")
+   }
+
    
    open func int2hex(_ int:UInt8)->(String)
    {
@@ -1215,7 +1507,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             do {
                try fileContentToWrite.write(to: url, atomically: false, encoding: String.Encoding.utf8)
             } catch {
-               print (error.localizedDescription)
+               print ("SaveResBut error \(error.localizedDescription)")
                //we should really have an error alert here instead
             }
          }
