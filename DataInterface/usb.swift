@@ -180,6 +180,30 @@ open class usb_teensy: NSObject
       return Int(result) //
    }
    
+   open func start_messung_USB()-> Int
+   {
+      read_OK = true
+      let timerDic:NSMutableDictionary  = ["count": 0]
+      
+      let result = rawhid_recv(0, &read_byteArray, Int32(BUFFER_SIZE), 50);
+      
+      print("*report_start_read_USB result: \(result)")
+      print("usb.swift start_read_byteArray start: *\n\(read_byteArray)*")
+      
+      // var somethingToPass = "It worked in teensy_send_USB"
+      //let xcont = true;
+      
+     // if (xcont == true)
+      
+         var timer : Timer? = nil
+         timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(usb_teensy.cont_read_USB(_:)), userInfo: timerDic, repeats: true)
+      
+      return Int(result) //
+   }
+ 
+   
+   
+   
    
    open func cont_read_USB(_ timer: Timer)
    {

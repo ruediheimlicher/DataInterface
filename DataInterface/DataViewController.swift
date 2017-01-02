@@ -491,7 +491,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             print("Kontrolle teensy.last_read_byteArray\n")
             for  index in 0..<BUFFER_SIZE
             {
-               
                //    print("\(teensy.last_read_byteArray[index])", terminator: "\t")
             }
             
@@ -502,7 +501,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             var newzeilenarray:[UInt16]! = []
             while (index < temparray.count / 2)
             {
-               
                //let bb = teensy.read_byteArray[DATA_START_BYTE + 2 * index]
                //let aa = teensy.read_byteArray[DATA_START_BYTE + 2 * index + 1]
                
@@ -520,7 +518,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                   let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
                   inputDataFeld.string = inputDataFeld.string! + "\n" + tempstring
                   newzeilenarray.removeAll(keepingCapacity: true)
-                  
                }
                // hi und lo zusammenfuehren
                //         index += 1
@@ -543,7 +540,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          print("LOGGER_CONT teensy.last_read_byteArray packetcount: \(packetcount)\n\(teensy.last_read_byteArray)\nend\n")
          
-         var index=0
          
          // print("\(teensy.last_read_byteArray)")
          loggerDataArray.append(teensy.last_read_byteArray);
@@ -651,7 +647,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let nrstring = String(messungnummer )
          _ = NumberFormatter()
          
-         print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
+         print("messungnummer: \(messungnummer) adcfloat: \(adcfloat)");
+         //print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
          ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
          
          loggerDataArray.append([UInt8(ADC0LO)]);
@@ -778,8 +775,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    //MARK: -   Logger
    @IBAction func report_start_download_logger_USB(_ sender: AnyObject)
    {
-      
-      print("report_start_download_logger_USB");
+       print("report_start_download_logger_USB");
       Stop_Logger.isEnabled = true
       zeit_Feld.stringValue = zeitstring()
       // tagmin_Feld.integerValue = tagminute
@@ -790,9 +786,31 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       if (erfolg == 0)
       {
          print("report_start_download_logger_USB: kein teensy da");
+         let alert: NSAlert = NSAlert()
+         alert.messageText = "Download nicht möglich"
+         alert.informativeText = "Kein Teensy eingesteckt."
+         alert.alertStyle = NSAlertStyle.informational
+         alert.addButton(withTitle: "OK")
+         alert.runModal()
+
          return
       }
-      
+//       let readerr = teensy.start_read_USB(true) // Timer für read einschalten
+      /*
+    
+      if (readerr == 0)
+      {
+                  print("Fehler in report_start_download_logger_USB")
+         let alert: NSAlert = NSAlert()
+         alert.messageText = "Download nicht möglich"
+         alert.informativeText = "Keine Antwort vom Teensy."
+         alert.alertStyle = NSAlertStyle.informational
+         alert.addButton(withTitle: "OK")
+         alert.runModal()
+
+   //      return
+      }
+*/
       teensy.write_byteArray[0] = UInt8(LOGGER_START)
       let startblock = read_sd_startblock.integerValue
       // index erster Block
@@ -1069,6 +1087,14 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          stop_read_USB_Knopf?.isEnabled = false;
          start_write_USB_Knopf?.isEnabled = false;
          stop_write_USB_Knopf?.isEnabled = false;
+         
+         let alert: NSAlert = NSAlert()
+         alert.messageText = "Verbindung nicht möglich"
+         alert.informativeText = "Kein Teensy eingesteckt."
+         alert.alertStyle = NSAlertStyle.informational
+         alert.addButton(withTitle: "OK")
+         alert.runModal()
+
       }
       print("antwort: \(teensy.status())")
       
@@ -1106,7 +1132,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
       }
       
-      teensy.write_byteArray[SAVE_SD_BYTE] = loggersettings
+   //   teensy.write_byteArray[SAVE_SD_BYTE] = loggersettings
       //Intervall lesen
       let selectedItem = IntervallPop.indexOfSelectedItem
       let intervallwert = IntervallPop .intValue
@@ -1189,6 +1215,13 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       print("start_messung sender: \(sender.state)") // gibt neuen State an
       if (sender.state == 1)
       {
+         let alert: NSAlert = NSAlert()
+         alert.messageText = "Verbindung nicht möglich"
+         alert.informativeText = "Kein Teensy eingesteckt."
+         alert.alertStyle = NSAlertStyle.informational
+         alert.addButton(withTitle: "OK")
+         alert.runModal()
+
          print("start_messung start")
          teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          
@@ -1196,15 +1229,37 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          // Abschnitt auf SD
          teensy.write_byteArray[ABSCHNITT_BYTE] = 0
          
+         // Intervall lesen
+         
+         let intervallwert = IntervallPop.integerValue
+         
+         teensy.write_byteArray[TAKT_LO_BYTE] = UInt8(intervallwert & 0x00FF)
+         teensy.write_byteArray[TAKT_HI_BYTE] = UInt8((intervallwert & 0xFF00)>>8)
+
          //Angabe zum  Startblock lesen. default ist 0
          let startblock = write_sd_startblock.integerValue
          
          teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
          teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+         
+         let readerr = teensy.start_messung_USB()
+         
+         if (readerr == 0)
+         {
+            print("Fehler in start_read_usb")
+         }
+
          let zeit = tagsekunde()
          print("start_messung startblock: \(startblock)  zeit: \(zeit)")
          inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
          Counter.intValue = 0
+         
+         self.datagraph.initGraphArray()
+         self.datagraph.setStartsekunde(startsekunde:tagsekunde())
+         self.datagraph.setMaxY(maxY: 100)
+         self.datagraph.setDisplayRect()
+
+         
       }
       else
       {
