@@ -816,11 +816,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       // index erster Block
       
       // old
-      teensy.write_byteArray[1] = UInt8(startblock & 0x00FF)
-      teensy.write_byteArray[2] = UInt8((startblock & 0xFF00)>>8)
+//      teensy.write_byteArray[1] = UInt8(startblock & 0x00FF)
+ //     teensy.write_byteArray[2] = UInt8((startblock & 0xFF00)>>8)
 
- //     teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF)
- //     teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+      teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF)
+      teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
       
       /*
        teensy.write_byteArray[3] =  UInt8(blockcount  & 0x00FF)
