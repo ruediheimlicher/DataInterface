@@ -369,7 +369,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    {
       var datastring:String = ""
       var datastringarray:[String] = []
-      print("setMessungData: \(data)")
+//      print("setMessungData: \(data)")
+      
       for index in 0..<data.count
       {
          let tempzeilenarray:[Float] = data[index]
@@ -389,6 +390,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
       return datastring
    }
+   
+   
    
    //MARK: - viewDidLoad
    override func viewDidLoad()
@@ -443,7 +446,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       // ****************************************************************************
       case LOGGER_START: // Antwort auf LOGGER_START, Block geladen
          
-         print("newLoggerDataAktion logger start: \(code)")
+         print("newLoggerDataAktion logger start: \(code) startblock: \(read_sd_startblock.integerValue)")
          
          // ladefehler
          let readerr: UInt8 = teensy.last_read_byteArray[1] // eventueller fehler ist im Byte 1
@@ -794,7 +797,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       }
       
       teensy.write_byteArray[0] = UInt8(LOGGER_START)
-      let startblock = read_sd_startblock.integerValue
+      startblock = UInt16(write_sd_startblock.integerValue)
       // index erster Block
       
       // old
@@ -1119,7 +1122,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
       
       //Angabe zum  Startblock lesen. default ist 0
-      let startblock = write_sd_startblock.integerValue
+      startblock = UInt16(write_sd_startblock.integerValue)
       teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
       teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
       
@@ -1189,7 +1192,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       print("start_messung sender: \(sender.state)") // gibt neuen State an
       if (sender.state == 1)
       {
-         print("start_messung start")
+         print("start_messung start ")
          teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          
          teensy.write_byteArray[1] = UInt8(SAVE_SD_RUN)
@@ -1197,7 +1200,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          teensy.write_byteArray[ABSCHNITT_BYTE] = 0
          
          //Angabe zum  Startblock lesen. default ist 0
-         let startblock = write_sd_startblock.integerValue
+         startblock = UInt16(write_sd_startblock.integerValue)
          
          teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
          teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
@@ -1216,11 +1219,18 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          usb_read_cont = false
          cont_read_check.state = 0;
          
-         print("DiagrammDataArray: \(DiagrammDataArray)")
+    //     print("DiagrammDataArray: \(DiagrammDataArray)")
          
-         let messungstring:String = MessungDataString(data:DiagrammDataArray)
+         var messungstring:String = MessungDataString(data:DiagrammDataArray)
          
          let prefix = datumprefix()
+         let intervall = IntervallPop.integerValue
+         //let startblock = write_sd_startblock.integerValue
+         
+         var kopfstring = prefix + "\n" + "intervall\t\(intervall)\tstartblock\t\(startblock)\n"
+         
+         messungstring = kopfstring + messungstring
+         
          let dataname = prefix + "_messungdump.txt"
          
          writeData(name: dataname,data:messungstring)
