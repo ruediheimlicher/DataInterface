@@ -1199,13 +1199,18 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          // Abschnitt auf SD
          teensy.write_byteArray[ABSCHNITT_BYTE] = 0
          
-         //Angabe zum  Startblock lesen. default ist 0
+         //Angabe zum  Startblock aktualisieren
          startblock = UInt16(write_sd_startblock.integerValue)
          
          teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
          teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+         
+         print("block lo: \(teensy.write_byteArray[BLOCKOFFSETLO_BYTE]) hi: \(teensy.write_byteArray[BLOCKOFFSETHI_BYTE])")
+         
+         
          let zeit = tagsekunde()
          print("start_messung startblock: \(startblock)  zeit: \(zeit)")
+         
          inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
          Counter.intValue = 0
       }
@@ -1214,6 +1219,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("start_messung stop")
          teensy.write_byteArray[0] = UInt8(MESSUNG_STOP)
          teensy.write_byteArray[1] = UInt8(SAVE_SD_STOP)
+         
+         teensy.write_byteArray[BLOCKOFFSETLO_BYTE] = UInt8(startblock & 0x00FF) // Startblock
+         teensy.write_byteArray[BLOCKOFFSETHI_BYTE] = UInt8((startblock & 0xFF00)>>8)
+
+         
          
          teensy.read_OK = false
          usb_read_cont = false

@@ -313,7 +313,7 @@ open class usb_teensy: NSObject
       {
          return 0
       }
-      write_byteArray[4] = usb_count
+//      write_byteArray[4] = usb_count // byte ist besetzt
       if (usb_count < 0xFF)
       {
       usb_count += 1
