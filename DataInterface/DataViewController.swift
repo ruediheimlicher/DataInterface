@@ -800,7 +800,12 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("report_start_download_logger_USB: kein teensy da");
          return
       }
-      
+      let readerr = teensy.start_read_USB(usb_read_cont)
+      if (readerr == 0)
+      {
+         print("Fehler in report_start_messung")
+      }
+
       teensy.write_byteArray[0] = UInt8(LOGGER_START)
       startblock = UInt16(write_sd_startblock.integerValue)
       // index erster Block
