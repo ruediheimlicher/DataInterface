@@ -462,7 +462,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          if (readerr == 0)
          {
             print("newLoggerDataAktion LOGGER_START: OK")
-            
+
             packetcount = 0
             cont_log_USB(paketcnt: (packetcount))
             //inputDataFeld.string =
@@ -635,86 +635,86 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          let counter = (counterLO & 0x00FF) | ((counterHI & 0xFF00)>>8)
          Counter.intValue = counter
-         let ADC0LO:Int32 =  Int32(teensy.read_byteArray[ADCLO])
-         let ADC0HI:Int32 =  Int32(teensy.read_byteArray[ADCHI])
-         
-         let adc0 = ADC0LO | (ADC0HI<<8)
+            let ADC0LO:Int32 =  Int32(teensy.read_byteArray[ADCLO])
+            let ADC0HI:Int32 =  Int32(teensy.read_byteArray[ADCHI])
+
+            let adc0 = ADC0LO | (ADC0HI<<8)
          //print("counter: \(counter) adc0: \(adc0)");
-         
-         
-         //           print ("ADC0LO: \(ADC0LO) ADC0HI: \(ADC0HI)  adc0: \(adc0)");
-         
-         // print ("adc0: \(adc0)");
-         ADCLO_Feld.intValue = ADC0LO
-         ADCHI_Feld.intValue = ADC0HI
-         
-         var  adcfloat:Float = Float(adc0) * 249 / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
-         //         print ("adcfloat: \(adcfloat)");
-         
-         adcfloat = floorf(adcfloat * Float(2)) / 2
-         
-         let NR_LO = Int32(teensy.read_byteArray[DATACOUNT_LO])
-         let NR_HI = Int32(teensy.read_byteArray[DATACOUNT_HI])
-         
-         
-         let messungnummer = NR_LO | (NR_HI<<8)
-         
-         let nrstring = String(messungnummer )
-         _ = NumberFormatter()
-         
-         print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
-         ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
-         
-         //loggerDataArray.append([UInt8(ADC0LO)]);
-         var tempinputDataFeldstring = String(tagsekunde()) + "\t" +  ADCFeld.stringValue
-         
-         // Zeile in inputDataFeld laden
-         inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
-         
-         
-      //   let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
-      //   let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
-     //    let adc1 = ADC1LO | (ADC1HI<<8)
-         let tempzeit = tagsekunde()
-         let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
-         
-         
-         // datenzeile fuer Diagramm
-         var tempwerte = [Float] ( repeating: 0.0, count: 9 )
-         tempwerte[0] = Float(tempzeit) // Abszisse
-         tempwerte[1] = Float(adcfloat)
-         //tempwerte[2] = Float(adcfloat + 10)
-         //print("tempwerte: \(tempwerte)")
-         DiagrammDataArray.append(tempwerte)
-         
-         
-         //print("DiagrammDataArray: \(DiagrammDataArray)")
-         
-         // Daten einsetzen in graph
-         self.datagraph.setWerteArray(werteArray:tempwerte)
-         
-         let PlatzRechts:Float = 20.0
-         let contentwidth = Float(self.dataScroller.contentView.bounds.size.width)
-         
-         // let lastdata = self.datagraph.DatenArray.last
-         let lastxold = Float((self.datagraph.DatenArray.last?[0])!)
-         let lastx = Float((self.datagraph.DatenDicArray.last?["x"])!)
-         
-         //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
-         // documentView: The view the scroll view scrolls within its content view
-         let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
-//         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
-         
-         if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ
-         {
-            let delta = contentwidth / 10 * 8
             
-            print("lastdata zu gross \(lastx) delta:  \(delta)")
-            self.dataScroller.documentView?.frame.origin.x -=   CGFloat(delta)
-            self.dataScroller.contentView.needsDisplay = true
-         }
-         
-         // end data
+            
+            //           print ("ADC0LO: \(ADC0LO) ADC0HI: \(ADC0HI)  adc0: \(adc0)");
+            
+            // print ("adc0: \(adc0)");
+            ADCLO_Feld.intValue = ADC0LO
+            ADCHI_Feld.intValue = ADC0HI
+            
+            var  adcfloat:Float = Float(adc0) * 249 / 1024   // Kalibrierung teensy2: VREF ist 2.49 anstatt 2.56
+            //         print ("adcfloat: \(adcfloat)");
+            
+            adcfloat = floorf(adcfloat * Float(2)) / 2
+            
+            let NR_LO = Int32(teensy.read_byteArray[DATACOUNT_LO])
+            let NR_HI = Int32(teensy.read_byteArray[DATACOUNT_HI])
+            
+            
+            let messungnummer = NR_LO | (NR_HI<<8)
+            
+            let nrstring = String(messungnummer )
+            _ = NumberFormatter()
+            
+            print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
+            ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
+            
+            //loggerDataArray.append([UInt8(ADC0LO)]);
+            var tempinputDataFeldstring = String(tagsekunde()) + "\t" +  ADCFeld.stringValue
+            
+            // Zeile in inputDataFeld laden
+            inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
+            
+            
+            //   let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
+            //   let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
+            //    let adc1 = ADC1LO | (ADC1HI<<8)
+            let tempzeit = tagsekunde()
+            let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
+            
+            
+            // datenzeile fuer Diagramm
+            var tempwerte = [Float] ( repeating: 0.0, count: 9 )
+            tempwerte[0] = Float(tempzeit) // Abszisse
+            tempwerte[1] = Float(adcfloat)
+            //tempwerte[2] = Float(adcfloat + 10)
+            //print("tempwerte: \(tempwerte)")
+            DiagrammDataArray.append(tempwerte)
+            
+            
+            //print("DiagrammDataArray: \(DiagrammDataArray)")
+            
+            // Daten einsetzen in graph
+            self.datagraph.setWerteArray(werteArray:tempwerte)
+            
+            let PlatzRechts:Float = 20.0
+            let contentwidth = Float(self.dataScroller.contentView.bounds.size.width)
+            
+            // let lastdata = self.datagraph.DatenArray.last
+            let lastxold = Float((self.datagraph.DatenArray.last?[0])!)
+            let lastx = Float((self.datagraph.DatenDicArray.last?["x"])!)
+            
+            //let lastx_n = Float((self.datagraph.DatenDicArray.last?["x"])!)
+            // documentView: The view the scroll view scrolls within its content view
+            let  docviewx = Float((self.dataScroller.documentView?.frame.origin.x)!)
+            //         print("last data lastx: \(lastx) docviewx:  \(docviewx) diff lastx + docviewx: \(lastx + docviewx) ")
+            
+            if (((lastx) + docviewx ) > (contentwidth / 10 * 8 ) + PlatzRechts) // docviewx ist negativ
+            {
+               let delta = contentwidth / 10 * 8
+               
+               print("lastdata zu gross \(lastx) delta:  \(delta)")
+               self.dataScroller.documentView?.frame.origin.x -=   CGFloat(delta)
+               self.dataScroller.contentView.needsDisplay = true
+            }
+            
+            // end data
          
          // ****************************************************************************
          // ****************************************************************************
