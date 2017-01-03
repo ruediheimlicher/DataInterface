@@ -479,9 +479,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          //print("newLoggerDataAktion logger cont: \(code)")
          
          // old
-         let packetcount: UInt8 = teensy.last_read_byteArray[3]
+         //let packetcount: UInt8 = teensy.last_read_byteArray[3]
          
-        // let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
+         let packetcount: UInt8 = teensy.last_read_byteArray[PACKETCOUNT_BYTE]
          print("newLoggerDataAktion LOGGER_CONT: \(code)\t packetcount: \(packetcount)")
          
          // gelesene Daten
@@ -816,8 +816,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
        teensy.write_byteArray[4] = UInt8((blockcount & 0xFF00)>>8)
        */
       packetcount=0
-      teensy.write_byteArray[3] = packetcount // beginn bei Paket 0
+      // old
+      //teensy.write_byteArray[3] = packetcount // beginn bei Paket 0
       
+      teensy.write_byteArray[PACKETCOUNT_BYTE] = packetcount // beginn bei Paket 0
+
       // cont write aktivieren
       cont_write_check.state = 1
       
@@ -843,10 +846,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
        */
       
       // old
-      teensy.write_byteArray[3] = paketcnt // beginn bei Paket next
+      //teensy.write_byteArray[PACKET] = paketcnt // beginn bei Paket next
 
       
-     // teensy.write_byteArray[PACKETCOUNT_BYTE] = paketcnt // beginn bei Paket next
+      teensy.write_byteArray[PACKETCOUNT_BYTE] = paketcnt // beginn bei Paket next
       
       var senderfolg = teensy.cont_write_USB()
       
@@ -1097,6 +1100,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
     @IBAction func close_USB(_ sender: AnyObject)
     {
       teensy.close_hid()
+      manufactorer.stringValue = ""
+      USB_OK.stringValue = "?"
    }
 
 

@@ -413,7 +413,11 @@ open class usb_teensy: NSObject
 
    open func cont_write_USB()->Int32
    {
+      //old
       //write_byteArray[3] = packetcount
+      
+      //write_byteArray[PACKETCOUNT_BYTE] = packetcount
+      
       print("*** cont_write_USB packetcount: \(write_byteArray[PACKETCOUNT_BYTE])\n\twrite_byteArray: ", terminator: "")
       var i=0;
       
