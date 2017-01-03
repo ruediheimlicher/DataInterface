@@ -90,6 +90,8 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    var loggerDataArray:[[UInt8]] = [[]]
    var DiagrammDataArray:[[Float]] = [[]]
 
+   var MessungStartzeit = 0
+   
    var teensycode:UInt8 = 0
    
    var spistatus:UInt8 = 0;
@@ -117,7 +119,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
    
    @IBOutlet  var Start: NSButton!
    
-   @IBOutlet  var inputDataFeldFeld: NSTextField!
+   @IBOutlet  var MessungStartzeitFeld: NSTextField!
    
    @IBOutlet  var USB_OK: NSTextField!
    
@@ -463,6 +465,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             
             packetcount = 0
             cont_log_USB(paketcnt: (packetcount))
+            //inputDataFeld.string =
          }
          else
          {
@@ -505,8 +508,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             var temparray = teensy.last_read_byteArray[DATA_START_BYTE...(BUFFER_SIZE-1)] // Teilarray mit Daten
             let anz = temparray.count
             var index = 0
-            // hi und lo zusammenfuegen, neu speichern
+            // hi und lo zusammenfuegen, neu speichern in newzeilenarray
             var newzeilenarray:[UInt16]! = []
+            
             while (index < temparray.count / 2)
             {
                
@@ -521,7 +525,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
                
                newzeilenarray.append(tempwert)
                index += 1
-               if ((index > 0) && (index%8 == 0))
+               if ((index > 0) && (index%8 == 0)) // neue zeile im String
                {
                   //   print ("\nindex: \(index) newzeilenarray: \n\(newzeilenarray)")
                   let tempstring = newzeilenarray.map{String($0)}.joined(separator: "\t")
@@ -674,11 +678,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let tempzeit = tagsekunde()
          let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
          
-         //      DiagrammDataArray.append(datazeile)
          
          // datenzeile fuer Diagramm
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
          tempwerte[0] = Float(tempzeit) // Abszisse
+         //tempwerte[1] = Float(messungnummer)
          tempwerte[1] = Float(adcfloat)
          //tempwerte[2] = Float(adcfloat + 10)
          //print("tempwerte: \(tempwerte)")
@@ -742,8 +746,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       
       let rotA:Int32 = (b1 | (b2<<8))
       
-      //inputDataFeldFeld.stringValue = NSString(format:"%2X", rotA)
-      inputDataFeldFeld.intValue = Int32(rotA)
       
       spannungsanzeige.intValue = Int32(rotA )
       
@@ -1002,7 +1004,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
 
    func USBfertigAktion(notification:Notification) -> Void
    {
-      NSLog("USBfertigAktion will schliessen \(notification)")
+      //NSLog("USBfertigAktion will schliessen \(notification)")
       //& http://stackoverflow.com/questions/30027780/swift-accessing-appdelegate-window-from-viewcontroller
       let appDelegate = NSApplication.shared().delegate as? AppDelegate
       let hauptfenster:NSWindow = (appDelegate?.window)!
@@ -1220,8 +1222,9 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             print("start_messung error ")
          }
          
-         DiagrammDataArray.removeAll()
          
+         MessungStartzeitFeld.integerValue = tagsekunde()
+         MessungStartzeit = tagsekunde()
          teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          
          teensy.write_byteArray[1] = UInt8(SAVE_SD_RUN)
@@ -1242,6 +1245,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          
          inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
          Counter.intValue = 0
+         DiagrammDataArray.removeAll()
       }
       else
       {
@@ -1266,7 +1270,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let intervall = IntervallPop.integerValue
          //let startblock = write_sd_startblock.integerValue
          
-         var kopfstring = prefix + "\n" + "intervall\t\(intervall)\tstartblock\t\(startblock)\n"
+         var kopfstring = prefix + "\n" + "startzeit\t\(MessungStartzeit)\tintervall\t\(intervall)\tstartblock\t\(startblock)\n"
          
          messungstring = kopfstring + messungstring
          
