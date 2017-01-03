@@ -661,16 +661,16 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("messungnummer: \(messungnummer) adcfloat: \(adcfloat) String: \(adcfloat)");
          ADCFeld.stringValue = NSString(format:"%.01f", adcfloat) as String
          
-         loggerDataArray.append([UInt8(ADC0LO)]);
+         //loggerDataArray.append([UInt8(ADC0LO)]);
          var tempinputDataFeldstring = String(tagsekunde()) + "\t" +  ADCFeld.stringValue
          
          // Zeile in inputDataFeld laden
          inputDataFeld.string = inputDataFeld.string! + String(messungnummer) + "\t" +  tempinputDataFeldstring + "\n"
          
          
-         let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
-         let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
-         let adc1 = ADC1LO | (ADC1HI<<8)
+      //   let ADC1LO:Int32 =  Int32(teensy.read_byteArray[ADCLO+2])
+      //   let ADC1HI:Int32 =  Int32(teensy.read_byteArray[ADCHI+2])
+     //    let adc1 = ADC1LO | (ADC1HI<<8)
          let tempzeit = tagsekunde()
          let datazeile:[Float] = [Float(tempzeit),Float(adcfloat)]
          
@@ -1220,7 +1220,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
             print("start_messung error ")
          }
          
-         
+         DiagrammDataArray.removeAll()
          
          teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          
@@ -1258,7 +1258,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          usb_read_cont = false
          cont_read_check.state = 0;
          
-    //     print("DiagrammDataArray: \(DiagrammDataArray)")
+         print("DiagrammDataArray: \(DiagrammDataArray)")
          
          var messungstring:String = MessungDataString(data:DiagrammDataArray)
          
