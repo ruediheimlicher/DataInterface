@@ -414,6 +414,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          object:nil, queue:nil,
          using:newLoggerDataAktion)
 
+      
+      USB_OK.textColor = NSColor.red
+      USB_OK.stringValue = "?";
+
    }//viewDidLoad
    // ****************************************************************************
    //MARK: -   newLoggerDataAktion
@@ -429,7 +433,7 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       teensy.new_Data = false
       // NSBeep()
       let code:Int = Int(teensy.read_byteArray[0])
-      let codestring = int2hex(UInt8(code))
+      //let codestring = int2hex(UInt8(code))
       //print("newLoggerDataAktion code: \(code) \(codestring)")
       
       switch (code)
@@ -1007,8 +1011,10 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          stop_read_USB(self)
          stop_write_USB(self)
          
-         teensycode &= ~(1<<7)
-         teensy.write_byteArray[15] = teensycode
+         
+         //teensycode &= ~(1<<7)
+         //teensy.write_byteArray[15] = teensycode
+         
          teensy.write_byteArray[0] = UInt8(USB_STOP)
          
 //         teensy.write_byteArray[1] = UInt8(data0.intValue)
@@ -1032,10 +1038,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          print("dialogfenster")
          return;
       }
-      
-      NSApplication.shared().terminate(self)
-      return
-      
    }
    
    @IBAction func check_USB(_ sender: NSButton)
@@ -1197,7 +1199,24 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       print("start_messung sender: \(sender.state)") // gibt neuen State an
       if (sender.state == 1)
       {
-         print("start_messung start ")
+         //print("start_messung start ")
+         
+         teensy.close_hid()
+         
+         let erfolg = UInt8(teensy.USBOpen())
+         if (erfolg > 0)
+         {
+            usbstatus = erfolg
+            print("start_messung start OK")
+         }
+         else
+         {
+            
+            print("start_messung error ")
+         }
+         
+         
+         
          teensy.write_byteArray[0] = UInt8(MESSUNG_START)
          
          teensy.write_byteArray[1] = UInt8(SAVE_SD_RUN)
