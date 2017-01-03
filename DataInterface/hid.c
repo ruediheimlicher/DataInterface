@@ -423,6 +423,15 @@ int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
 	return count;
 }
 
+void rawhid_close(int num)
+{
+   hid_t *hid;
+   
+   hid = get_hid(num);
+   if (!hid || !hid->open) return;
+   hid_close(hid);
+   hid->open = 0;
+}
 
 
 static void hid_close(hid_t *hid)

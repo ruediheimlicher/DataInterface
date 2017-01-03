@@ -151,7 +151,11 @@ open class usb_teensy: NSObject
    }
    
    
-
+   open func close_hid()
+   {
+      
+      rawhid_close(0);
+   }
    
    
    open func status()->Int32

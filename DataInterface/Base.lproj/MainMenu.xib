@@ -1590,10 +1590,10 @@
                         <buttonCell key="cell" type="push" title="Button" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="51f-Yw-co0">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
-                            <connections>
-                                <action selector="SaveResButWithSender:" target="9Ve-yB-YH6" id="E2j-Mi-SMm"/>
-                            </connections>
                         </buttonCell>
+                        <connections>
+                            <action selector="close_USB:" target="9Ve-yB-YH6" id="dZu-RY-0RU"/>
+                        </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YwA-is-eqJ">
                         <rect key="frame" x="227" y="549" width="37" height="17"/>

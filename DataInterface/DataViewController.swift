@@ -1091,6 +1091,11 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
       usb_write_cont = false
       cont_write_check.state = 0;
    }
+   
+    @IBAction func close_USB(_ sender: AnyObject)
+    {
+      teensy.close_hid()
+   }
 
 
   //MARK: - Konfig Messung
