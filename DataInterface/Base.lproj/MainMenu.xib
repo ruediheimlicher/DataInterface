@@ -61,7 +61,6 @@
                 <outlet property="extspannungStepper" destination="6PC-Le-trK" id="cMG-e3-pAv"/>
                 <outlet property="extstrom" destination="mwS-Cc-HTl" id="VzP-A1-1Dm"/>
                 <outlet property="inputDataFeld" destination="Ufr-cB-3Ye" id="poQ-Ph-fhm"/>
-                <outlet property="inputDataFeldFeld" destination="HzF-dp-QhZ" id="QWL-ID-teb"/>
                 <outlet property="jahr_Feld" destination="e54-Kq-dZb" id="TP4-mg-95C"/>
                 <outlet property="manufactorer" destination="P8z-1w-Gew" id="Cyc-Uf-lqY"/>
                 <outlet property="min_Feld" destination="jmu-xj-hCu" id="eDf-Uh-y2E"/>

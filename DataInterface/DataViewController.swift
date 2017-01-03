@@ -682,7 +682,6 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          // datenzeile fuer Diagramm
          var tempwerte = [Float] ( repeating: 0.0, count: 9 )
          tempwerte[0] = Float(tempzeit) // Abszisse
-         //tempwerte[1] = Float(messungnummer)
          tempwerte[1] = Float(adcfloat)
          //tempwerte[2] = Float(adcfloat + 10)
          //print("tempwerte: \(tempwerte)")
@@ -1243,9 +1242,23 @@ class DataViewController: NSViewController, NSWindowDelegate, AVAudioPlayerDeleg
          let zeit = tagsekunde()
          print("start_messung startblock: \(startblock)  zeit: \(zeit)")
          
-         inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
          Counter.intValue = 0
+         
+         self.datagraph.initGraphArray()
+         self.datagraph.setStartsekunde(startsekunde:tagsekunde())
+         self.datagraph.setMaxY(maxY: 100)
+         self.datagraph.setDisplayRect()
+
+         
+         let readerr = teensy.start_read_USB(usb_read_cont)
+         if (readerr == 0)
+         {
+            print("Fehler in report_start_messung")
+         }
+
          DiagrammDataArray.removeAll()
+         inputDataFeld.string = "Messung tagsekunde: \(zeit)\n"
+
       }
       else
       {
