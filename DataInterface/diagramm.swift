@@ -18,7 +18,7 @@ class DataPlot: NSView
    var DatenDicArray:[[String:CGFloat]]! = [[:]]
    var DatenArray:[[CGFloat]]! = [[]]
    var GraphArray = [CGMutablePath]( repeating: CGMutablePath(), count: 8 )
-   var KanalArray = [1,0,0,0,0,0,0,0]
+   var KanalArray = [1,1,0,0,0,0,0,0]
    var FaktorArray:[CGFloat]! = [CGFloat](repeating:0.5,count:8)
    var DatafarbeArray:[NSColor]! = [NSColor](repeating:NSColor.gray,count:8) // Strichfarbe im Diagramm
    
@@ -593,7 +593,10 @@ extension DataPlot
          //context?.beginPath()
          context?.drawPath(using: .stroke)
          
-         let wert = lastdata?[String(i)]
+
+         
+       if   let wert = lastdata?[String(i)]
+       {
  //        Swift.print("diagramm lastdatax: \(lastdatax!)")
 
          //         Swift.print("i: \(i) qlastx: \(qlastx) qlasty: \(qlasty) wert: \(wert)\n")
@@ -609,7 +612,7 @@ extension DataPlot
          
          //let labelfarbe = CGColor.init(red:1.0,green: 1.0, blue: 0.0,alpha:1.0)
          let labelfarbe = NSColor.init(red:0.5,green: 0.8, blue: 0.5,alpha:1.0)
-         let tempWertString = String(format: "%2.1f",  wert!)
+         let tempWertString = String(format: "%2.1f",  wert)
          //         Swift.print("i: \(i) p.y: \(p.y) wert: \(wert) tempWertString: \(tempWertString) DatenArray.last: \(DatenArray.last)")
          let paragraphStyle = NSMutableParagraphStyle()
          paragraphStyle.alignment = .left
@@ -617,7 +620,7 @@ extension DataPlot
          let attrs = [NSFontAttributeName: NSFont(name: "HelveticaNeue", size: 10)!, NSParagraphStyleAttributeName: paragraphStyle ,NSForegroundColorAttributeName: DatafarbeArray[i]]
          tempWertString.draw(with: CGRect(x: p.x + 4, y: p.y-6, width: 40, height: 14), options: .usesLineFragmentOrigin, attributes: attrs, context: nil)
          
-         
+         }
       }
       
       
